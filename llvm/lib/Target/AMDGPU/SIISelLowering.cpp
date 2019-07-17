@@ -4169,6 +4169,32 @@ static SDValue lowerFCMPIntrinsic(const SITargetLowering &TLI,
   return DAG.getZExtOrTrunc(SetCC, SL, VT);
 }
 
+static SDValue lowerBALLOTIntrinsic(const SITargetLowering &TLI,
+                                    SDNode *N, SelectionDAG &DAG) {
+  EVT VT = N->getValueType(0);
+
+  SDValue Src = N->getOperand(1);
+  SDLoc DL(N);
+
+  if (auto ConstSrc = dyn_cast<ConstantSDNode>(Src)) {
+    if (ConstSrc->isNullValue())
+      // Optimization: amdgcn_ballot(0) returns all zeroes.
+      return DAG.getConstant(0, DL, VT);
+    if (ConstSrc->isOne()) {
+      // Optimization: amdgcn_ballot(1) returns exec.
+      MachineFunction &MF = DAG.getMachineFunction();
+      const GCNSubtarget &ST = MF.getSubtarget<GCNSubtarget>();
+      unsigned Exec = ST.isWave32() ? AMDGPU::EXEC_LO : AMDGPU::EXEC;
+      return DAG.getRegister(Exec, VT);
+    }
+  }
+
+  Src = DAG.getNode(ISD::ZERO_EXTEND, DL, MVT::i32, Src);
+  return DAG.getNode(AMDGPUISD::SETCC, DL, VT, Src,
+                     DAG.getConstant(0, DL, MVT::i32),
+                     DAG.getCondCode(ISD::SETNE));
+}
+
 void SITargetLowering::ReplaceNodeResults(SDNode *N,
                                           SmallVectorImpl<SDValue> &Results,
                                           SelectionDAG &DAG) const {
@@ -5930,9 +5956,10 @@ SDValue SITargetLowering::LowerINTRINSIC_WO_CHAIN(SDValue Op,
       return Op;
     return lowerICMPIntrinsic(*this, Op.getNode(), DAG);
   }
-  case Intrinsic::amdgcn_fcmp: {
+  case Intrinsic::amdgcn_fcmp:
     return lowerFCMPIntrinsic(*this, Op.getNode(), DAG);
-  }
+  case Intrinsic::amdgcn_ballot:
+    return lowerBALLOTIntrinsic(*this, Op.getNode(), DAG);
   case Intrinsic::amdgcn_fmed3:
     return DAG.getNode(AMDGPUISD::FMED3, DL, VT,
                        Op.getOperand(1), Op.getOperand(2), Op.getOperand(3));
