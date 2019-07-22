@@ -4178,10 +4178,10 @@ static SDValue lowerBALLOTIntrinsic(const SITargetLowering &TLI,
 
   if (auto ConstSrc = dyn_cast<ConstantSDNode>(Src)) {
     if (ConstSrc->isNullValue())
-      // Optimization: amdgcn_ballot(0) returns all zeroes.
+      // Optimization: ballot(0) returns all zeroes.
       return DAG.getConstant(0, DL, VT);
     if (ConstSrc->isOne()) {
-      // Optimization: amdgcn_ballot(1) returns exec.
+      // Optimization: ballot(1) returns exec.
       MachineFunction &MF = DAG.getMachineFunction();
       const GCNSubtarget &ST = MF.getSubtarget<GCNSubtarget>();
       unsigned Exec = ST.isWave32() ? AMDGPU::EXEC_LO : AMDGPU::EXEC;
@@ -4190,9 +4190,10 @@ static SDValue lowerBALLOTIntrinsic(const SITargetLowering &TLI,
   }
 
   Src = DAG.getNode(ISD::ZERO_EXTEND, DL, MVT::i32, Src);
-  return DAG.getNode(AMDGPUISD::SETCC, DL, VT, Src,
-                     DAG.getConstant(0, DL, MVT::i32),
-                     DAG.getCondCode(ISD::SETNE));
+  SDValue SetCC = DAG.getNode(AMDGPUISD::SETCC, DL, VT, Src,
+                              DAG.getConstant(0, DL, MVT::i32),
+                              DAG.getCondCode(ISD::SETNE));
+  return DAG.getZExtOrTrunc(SetCC, DL, VT);
 }
 
 void SITargetLowering::ReplaceNodeResults(SDNode *N,
