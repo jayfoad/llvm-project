@@ -472,7 +472,9 @@ void AMDGPUAtomicOptimizer::optimizeAtomic(Instruction &I,
     // that they can correctly contribute to the final result.
     NewV = B.CreateIntrinsic(Intrinsic::amdgcn_set_inactive, Ty, {V, Identity});
 
-    NewV = buildScan(B, Op, NewV, Identity);
+    const AtomicRMWInst::BinOp ScanOp =
+        Op == AtomicRMWInst::Sub ? AtomicRMWInst::Add : Op;
+    NewV = buildScan(B, ScanOp, NewV, Identity);
     ExclScan = buildShiftRight(B, NewV, Identity);
 
     // Read the value from the last lane, which has accumlated the values of
