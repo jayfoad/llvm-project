@@ -45,11 +45,11 @@ define amdgpu_kernel void @v_ctpop_i64(i32 addrspace(1)* noalias %out, i64 addrs
 
 ; FUNC-LABEL: {{^}}v_ctpop_i64_user:
 ; GCN: {{buffer|flat}}_load_dwordx2 v{{\[}}[[LOVAL:[0-9]+]]:[[HIVAL:[0-9]+]]{{\]}},
+; GCN: v_mov_b32_e32 v[[RESULT_HI:[0-9]+]], s{{[0-9]+}}
 ; GCN: v_bcnt_u32_b32{{(_e64)*}} [[MIDRESULT:v[0-9]+]], v[[LOVAL]], 0
 ; SI-NEXT: v_bcnt_u32_b32_e32 [[RESULT:v[0-9]+]], v[[HIVAL]], [[MIDRESULT]]
 ; VI-NEXT: v_bcnt_u32_b32 [[RESULT:v[0-9]+]], v[[HIVAL]], [[MIDRESULT]]
-; GCN-DAG: v_or_b32_e32 v[[RESULT_LO:[0-9]+]], s{{[0-9]+}}, [[RESULT]]
-; GCN-DAG: v_mov_b32_e32 v[[RESULT_HI:[0-9]+]], s{{[0-9]+}}
+; GCN: v_or_b32_e32 v[[RESULT_LO:[0-9]+]], s{{[0-9]+}}, [[RESULT]]
 ; GCN: buffer_store_dwordx2 v{{\[}}[[RESULT_LO]]:[[RESULT_HI]]{{\]}}
 ; GCN: s_endpgm
 define amdgpu_kernel void @v_ctpop_i64_user(i64 addrspace(1)* noalias %out, i64 addrspace(1)* noalias %in, i64 %s.val) nounwind {

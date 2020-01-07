@@ -15,6 +15,7 @@ define amdgpu_kernel void @clmem_read_simplified(i8 addrspace(1)*  %buffer) {
 ; GFX8:    flat_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}]
 ; GFX8:    flat_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}]
 ;
+; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:2048
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:2048
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:-4096
@@ -22,7 +23,6 @@ define amdgpu_kernel void @clmem_read_simplified(i8 addrspace(1)*  %buffer) {
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:2048
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:2048
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
-; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:2048
 ;
 ; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
 ; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:-2048
@@ -88,27 +88,27 @@ define hidden amdgpu_kernel void @clmem_read(i8 addrspace(1)*  %buffer) {
 ;
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:-4096
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:-2048
+; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:-4096
+; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:-2048
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:2048
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:-4096
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:-2048
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:2048
-; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off
-; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:-4096
-; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off
+; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
 ;
-; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:-2048
-; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
-; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
 ; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
 ; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:-2048
 ; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:-2048
 ; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
+; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
 ; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:-2048
-; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off
+; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
 ; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:-2048
-; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off
+; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
+; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:-2048
+; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
 entry:
   %call = tail call i64 @_Z13get_global_idj(i32 0)
   %conv = and i64 %call, 255
@@ -220,27 +220,27 @@ define amdgpu_kernel void @Address32(i8 addrspace(1)* %buffer) {
 ; GFX8:    flat_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}]
 ; GFX8:    flat_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}]
 ;
+; GFX9:    global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off{{$}}
+; GFX9:    global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:2048
+; GFX9:    global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:3072
+; GFX9:    global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:1024
+; GFX9:    global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off{{$}}
 ; GFX9:    global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:1024
 ; GFX9:    global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off{{$}}
 ; GFX9:    global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:1024
 ; GFX9:    global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:2048
 ; GFX9:    global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:3072
-; GFX9:    global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off{{$}}
-; GFX9:    global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:1024
-; GFX9:    global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:2048
-; GFX9:    global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:3072
-; GFX9:    global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off{{$}}
 ;
+; GFX10:   global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:1024
 ; GFX10:   global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off{{$}}
 ; GFX10:   global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:1024
 ; GFX10:   global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:-2048
-; GFX10:   global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:1024
-; GFX10:   global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:1024
 ; GFX10:   global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off{{$}}
+; GFX10:   global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:1024
+; GFX10:   global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:1024
 ; GFX10:   global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:-2048
-; GFX10:   global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:1024
-; GFX10:   global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:1024
 ; GFX10:   global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off{{$}}
+; GFX10:   global_load_dword {{v[0-9]+}}, v[{{[0-9]+:[0-9]+}}], off offset:1024
 entry:
    %call = tail call i64 @_Z13get_global_idj(i32 0)
    %conv = and i64 %call, 255
@@ -455,12 +455,12 @@ define amdgpu_kernel void @ReverseOrder(i8 addrspace(1)* %buffer) {
 ; GFX8:    flat_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}]
 ;
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
-; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:2048
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:2048
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:2048
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}
+; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:2048
 ; GFX9:    global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off offset:2048
 ;
 ; GFX10:   global_load_dwordx2 v[{{[0-9]+:[0-9]+}}], v[{{[0-9]+:[0-9]+}}], off{{$}}

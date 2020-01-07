@@ -9,11 +9,11 @@ define amdgpu_kernel void @test_barrier(i32 addrspace(1)* %out, i32 %size) #0 {
 ; VARIANT0:       ; %bb.0: ; %entry
 ; VARIANT0-NEXT:    s_load_dwordx2 s[4:5], s[0:1], 0x9
 ; VARIANT0-NEXT:    s_load_dword s2, s[0:1], 0xb
-; VARIANT0-NEXT:    v_not_b32_e32 v3, v0
 ; VARIANT0-NEXT:    s_mov_b32 s7, 0xf000
 ; VARIANT0-NEXT:    s_mov_b32 s6, 0
 ; VARIANT0-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; VARIANT0-NEXT:    v_mov_b32_e32 v2, 0
+; VARIANT0-NEXT:    v_not_b32_e32 v3, v0
 ; VARIANT0-NEXT:    s_waitcnt lgkmcnt(0)
 ; VARIANT0-NEXT:    buffer_store_dword v0, v[1:2], s[4:7], 0 addr64
 ; VARIANT0-NEXT:    s_waitcnt vmcnt(0) expcnt(0)
@@ -30,11 +30,11 @@ define amdgpu_kernel void @test_barrier(i32 addrspace(1)* %out, i32 %size) #0 {
 ; VARIANT1:       ; %bb.0: ; %entry
 ; VARIANT1-NEXT:    s_load_dwordx2 s[4:5], s[0:1], 0x9
 ; VARIANT1-NEXT:    s_load_dword s2, s[0:1], 0xb
-; VARIANT1-NEXT:    v_not_b32_e32 v3, v0
 ; VARIANT1-NEXT:    s_mov_b32 s7, 0xf000
 ; VARIANT1-NEXT:    s_mov_b32 s6, 0
 ; VARIANT1-NEXT:    v_lshlrev_b32_e32 v1, 2, v0
 ; VARIANT1-NEXT:    v_mov_b32_e32 v2, 0
+; VARIANT1-NEXT:    v_not_b32_e32 v3, v0
 ; VARIANT1-NEXT:    s_waitcnt lgkmcnt(0)
 ; VARIANT1-NEXT:    buffer_store_dword v0, v[1:2], s[4:7], 0 addr64
 ; VARIANT1-NEXT:    s_barrier

@@ -147,11 +147,11 @@ define amdgpu_kernel void @call_i64(<4 x i32> inreg %tmp14, i64 inreg %arg) {
 
 define amdgpu_cs void @_amdgpu_cs_main(<4 x i32> inreg %desc, i32 %index) {
   %tmp17 = shl i32 %index, 5
-; GFX9: buffer_load_dwordx4
+; GFX9-DAG: buffer_load_dwordx4
   %tmp18 = tail call <4 x i32> @llvm.amdgcn.s.buffer.load.v4i32(<4 x i32> %desc, i32 %tmp17, i32 0)
   %.i0.upto1.bc = bitcast <4 x i32> %tmp18 to <2 x i64>
   %tmp19 = or i32 %tmp17, 16
-; GFX9: buffer_load_dwordx2
+; GFX9-DAG: buffer_load_dwordx2
   %tmp20 = tail call <2 x i32> @llvm.amdgcn.s.buffer.load.v2i32(<4 x i32> %desc, i32 %tmp19, i32 0)
   %.i0.upto1.extract = extractelement <2 x i64> %.i0.upto1.bc, i32 0
   %tmp22 = tail call i64 @llvm.amdgcn.set.inactive.i64(i64 %.i0.upto1.extract, i64 9223372036854775807)

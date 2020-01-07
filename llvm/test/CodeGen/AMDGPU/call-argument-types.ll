@@ -863,22 +863,22 @@ entry:
 
 ; GCN-LABEL: {{^}}stack_8xv5i32:
 
-; GCN: v_mov_b32_e32 [[REG8:v[0-9]+]], 8
-; GCN: v_mov_b32_e32 [[REG9:v[0-9]+]], 9
-; GCN: v_mov_b32_e32 [[REG10:v[0-9]+]], 10
-; GCN: v_mov_b32_e32 [[REG11:v[0-9]+]], 11
-; GCN: v_mov_b32_e32 [[REG12:v[0-9]+]], 12
-; GCN: buffer_store_dword [[REG8]], {{.*$}}
-; GCN: buffer_store_dword [[REG9]], {{.*}} offset:4
-; GCN: buffer_store_dword [[REG10]], {{.*}} offset:8
-; GCN: buffer_store_dword [[REG11]], {{.*}} offset:12
-; GCN: buffer_store_dword [[REG12]], {{.*}} offset:16
-; GCN: v_mov_b32_e32 [[REG13:v[0-9]+]], 13
-; GCN: v_mov_b32_e32 [[REG14:v[0-9]+]], 14
-; GCN: v_mov_b32_e32 [[REG15:v[0-9]+]], 15
-; GCN: buffer_store_dword [[REG13]], {{.*}} offset:20
-; GCN: buffer_store_dword [[REG14]], {{.*}} offset:24
-; GCN: buffer_store_dword [[REG15]], {{.*}} offset:28
+; GCN-DAG: v_mov_b32_e32 [[REG8:v[0-9]+]], 8
+; GCN-DAG: v_mov_b32_e32 [[REG9:v[0-9]+]], 9
+; GCN-DAG: v_mov_b32_e32 [[REG10:v[0-9]+]], 10
+; GCN-DAG: v_mov_b32_e32 [[REG11:v[0-9]+]], 11
+; GCN-DAG: v_mov_b32_e32 [[REG12:v[0-9]+]], 12
+; GCN-DAG: v_mov_b32_e32 [[REG13:v[0-9]+]], 13
+; GCN-DAG: v_mov_b32_e32 [[REG14:v[0-9]+]], 14
+; GCN-DAG: v_mov_b32_e32 [[REG15:v[0-9]+]], 15
+; GCN-DAG: buffer_store_dword [[REG8]], {{.*$}}
+; GCN-DAG: buffer_store_dword [[REG9]], {{.*}} offset:4
+; GCN-DAG: buffer_store_dword [[REG10]], {{.*}} offset:8
+; GCN-DAG: buffer_store_dword [[REG11]], {{.*}} offset:12
+; GCN-DAG: buffer_store_dword [[REG12]], {{.*}} offset:16
+; GCN-DAG: buffer_store_dword [[REG13]], {{.*}} offset:20
+; GCN-DAG: buffer_store_dword [[REG14]], {{.*}} offset:24
+; GCN-DAG: buffer_store_dword [[REG15]], {{.*}} offset:28
 
 ; GCN: v_mov_b32_e32 v31, 7
 ; GCN: s_getpc
@@ -897,22 +897,22 @@ entry:
 }
 
 ; GCN-LABEL: {{^}}stack_8xv5f32:
-; GCN: v_mov_b32_e32 [[REG8:v[0-9]+]], 0x41000000
-; GCN: v_mov_b32_e32 [[REG9:v[0-9]+]], 0x41100000
-; GCN: v_mov_b32_e32 [[REG10:v[0-9]+]], 0x41200000
-; GCN: v_mov_b32_e32 [[REG11:v[0-9]+]], 0x41300000
-; GCN: v_mov_b32_e32 [[REG12:v[0-9]+]], 0x41400000
-; GCN: buffer_store_dword [[REG8]], {{.*$}}
-; GCN: buffer_store_dword [[REG9]], {{.*}} offset:4
-; GCN: buffer_store_dword [[REG10]], {{.*}} offset:8
-; GCN: buffer_store_dword [[REG11]], {{.*}} offset:12
-; GCN: buffer_store_dword [[REG12]], {{.*}} offset:16
-; GCN: v_mov_b32_e32 [[REG13:v[0-9]+]], 0x41500000
-; GCN: v_mov_b32_e32 [[REG14:v[0-9]+]], 0x41600000
-; GCN: v_mov_b32_e32 [[REG15:v[0-9]+]], 0x41700000
-; GCN: buffer_store_dword [[REG13]], {{.*}} offset:20
-; GCN: buffer_store_dword [[REG14]], {{.*}} offset:24
-; GCN: buffer_store_dword [[REG15]], {{.*}} offset:28
+; GCN-DAG: v_mov_b32_e32 [[REG8:v[0-9]+]], 0x41000000
+; GCN-DAG: v_mov_b32_e32 [[REG9:v[0-9]+]], 0x41100000
+; GCN-DAG: v_mov_b32_e32 [[REG10:v[0-9]+]], 0x41200000
+; GCN-DAG: v_mov_b32_e32 [[REG11:v[0-9]+]], 0x41300000
+; GCN-DAG: v_mov_b32_e32 [[REG12:v[0-9]+]], 0x41400000
+; GCN-DAG: v_mov_b32_e32 [[REG13:v[0-9]+]], 0x41500000
+; GCN-DAG: v_mov_b32_e32 [[REG14:v[0-9]+]], 0x41600000
+; GCN-DAG: v_mov_b32_e32 [[REG15:v[0-9]+]], 0x41700000
+; GCN-DAG: buffer_store_dword [[REG8]], {{.*$}}
+; GCN-DAG: buffer_store_dword [[REG9]], {{.*}} offset:4
+; GCN-DAG: buffer_store_dword [[REG10]], {{.*}} offset:8
+; GCN-DAG: buffer_store_dword [[REG11]], {{.*}} offset:12
+; GCN-DAG: buffer_store_dword [[REG12]], {{.*}} offset:16
+; GCN-DAG: buffer_store_dword [[REG13]], {{.*}} offset:20
+; GCN-DAG: buffer_store_dword [[REG14]], {{.*}} offset:24
+; GCN-DAG: buffer_store_dword [[REG15]], {{.*}} offset:28
 
 ; GCN: v_mov_b32_e32 v31, 0x40e00000
 ; GCN: s_getpc

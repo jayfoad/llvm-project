@@ -486,7 +486,8 @@ bool SIInstrInfo::shouldClusterMemOps(const MachineOperand &BaseOp1,
                                          ? MRI.getRegClass(Reg)
                                          : RI.getPhysRegClass(Reg);
 
-  return (NumLoads * (RI.getRegSizeInBits(*DstRC) / 8)) <= LoadClusterThreshold;
+  return (NumLoads + 1) * (RI.getRegSizeInBits(*DstRC) / 8) <=
+         LoadClusterThreshold;
 }
 
 // FIXME: This behaves strangely. If, for example, you have 32 load + stores,

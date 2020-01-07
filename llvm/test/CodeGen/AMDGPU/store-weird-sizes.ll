@@ -148,11 +148,11 @@ define amdgpu_kernel void @local_store_i65(i65 addrspace(3)* %ptr, i65 %arg) #0 
 ; HAWAII-NEXT:    s_mov_b32 m0, -1
 ; HAWAII-NEXT:    s_waitcnt lgkmcnt(0)
 ; HAWAII-NEXT:    v_mov_b32_e32 v2, s2
+; HAWAII-NEXT:    s_and_b32 s3, s3, 1
+; HAWAII-NEXT:    v_mov_b32_e32 v0, s3
+; HAWAII-NEXT:    ds_write_b8 v2, v0 offset:8
 ; HAWAII-NEXT:    v_mov_b32_e32 v0, s0
 ; HAWAII-NEXT:    v_mov_b32_e32 v1, s1
-; HAWAII-NEXT:    s_and_b32 s0, s3, 1
-; HAWAII-NEXT:    v_mov_b32_e32 v3, s0
-; HAWAII-NEXT:    ds_write_b8 v2, v3 offset:8
 ; HAWAII-NEXT:    ds_write_b64 v2, v[0:1]
 ; HAWAII-NEXT:    s_endpgm
 ;
@@ -164,11 +164,11 @@ define amdgpu_kernel void @local_store_i65(i65 addrspace(3)* %ptr, i65 %arg) #0 
 ; FIJI-NEXT:    s_mov_b32 m0, -1
 ; FIJI-NEXT:    s_waitcnt lgkmcnt(0)
 ; FIJI-NEXT:    v_mov_b32_e32 v2, s2
+; FIJI-NEXT:    s_and_b32 s3, s3, 1
+; FIJI-NEXT:    v_mov_b32_e32 v0, s3
+; FIJI-NEXT:    ds_write_b8 v2, v0 offset:8
 ; FIJI-NEXT:    v_mov_b32_e32 v0, s0
 ; FIJI-NEXT:    v_mov_b32_e32 v1, s1
-; FIJI-NEXT:    s_and_b32 s0, s3, 1
-; FIJI-NEXT:    v_mov_b32_e32 v3, s0
-; FIJI-NEXT:    ds_write_b8 v2, v3 offset:8
 ; FIJI-NEXT:    ds_write_b64 v2, v[0:1]
 ; FIJI-NEXT:    s_endpgm
 ;
@@ -180,9 +180,9 @@ define amdgpu_kernel void @local_store_i65(i65 addrspace(3)* %ptr, i65 %arg) #0 
 ; GFX9-NEXT:    s_waitcnt lgkmcnt(0)
 ; GFX9-NEXT:    v_mov_b32_e32 v2, s2
 ; GFX9-NEXT:    v_mov_b32_e32 v0, s0
+; GFX9-NEXT:    s_and_b32 s3, s3, 1
 ; GFX9-NEXT:    v_mov_b32_e32 v1, s1
-; GFX9-NEXT:    s_and_b32 s0, s3, 1
-; GFX9-NEXT:    v_mov_b32_e32 v3, s0
+; GFX9-NEXT:    v_mov_b32_e32 v3, s3
 ; GFX9-NEXT:    ds_write_b8 v2, v3 offset:8
 ; GFX9-NEXT:    ds_write_b64 v2, v[0:1]
 ; GFX9-NEXT:    s_endpgm

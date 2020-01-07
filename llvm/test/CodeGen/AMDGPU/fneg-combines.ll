@@ -2404,12 +2404,12 @@ define amdgpu_kernel void @free_fold_src_code_size_cost_use_f32(float addrspace(
 }
 
 ; GCN-LABEL: {{^}}free_fold_src_code_size_cost_use_f64:
-; GCN: {{buffer|flat}}_load_dwordx2 [[A:v\[[0-9]+:[0-9]+\]]]
-; GCN: {{buffer|flat}}_load_dwordx2 [[B:v\[[0-9]+:[0-9]+\]]]
-; GCN: {{buffer|flat}}_load_dwordx2 [[C:v\[[0-9]+:[0-9]+\]]]
-; GCN: {{buffer|flat}}_load_dwordx2 [[D:v\[[0-9]+:[0-9]+\]]]
+; GCN-DAG: {{buffer|flat}}_load_dwordx2 [[A:v\[[0-9]+:[0-9]+\]]]
+; GCN-DAG: {{buffer|flat}}_load_dwordx2 [[B:v\[[0-9]+:[0-9]+\]]]
+; GCN-DAG: {{buffer|flat}}_load_dwordx2 [[C:v\[[0-9]+:[0-9]+\]]]
+; GCN-DAG: {{buffer|flat}}_load_dwordx2 [[D:v\[[0-9]+:[0-9]+\]]]
 
-; GCN: v_fma_f64 [[FMA0:v\[[0-9]+:[0-9]+\]]], [[A]], [[B]], 2.0
+; GCN-DAG: v_fma_f64 [[FMA0:v\[[0-9]+:[0-9]+\]]], [[A]], [[B]], 2.0
 ; GCN-DAG: v_mul_f64 [[MUL0:v\[[0-9]+:[0-9]+\]]], -[[FMA0]], [[C]]
 ; GCN-DAG: v_mul_f64 [[MUL1:v\[[0-9]+:[0-9]+\]]], -[[FMA0]], [[D]]
 
