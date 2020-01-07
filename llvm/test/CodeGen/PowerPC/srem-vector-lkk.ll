@@ -12,10 +12,10 @@ define <4 x i16> @fold_srem_vec_1(<4 x i16> %x) {
 ; P9LE-LABEL: fold_srem_vec_1:
 ; P9LE:       # %bb.0:
 ; P9LE-NEXT:    li r3, 0
-; P9LE-NEXT:    vextuhrx r3, r3, v2
-; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    lis r5, -21386
+; P9LE-NEXT:    vextuhrx r3, r3, v2
 ; P9LE-NEXT:    ori r5, r5, 37253
+; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    extsw r4, r4
 ; P9LE-NEXT:    mulld r5, r4, r5
 ; P9LE-NEXT:    rldicl r5, r5, 32, 32
@@ -25,13 +25,14 @@ define <4 x i16> @fold_srem_vec_1(<4 x i16> %x) {
 ; P9LE-NEXT:    add r4, r4, r5
 ; P9LE-NEXT:    lis r5, 31710
 ; P9LE-NEXT:    mulli r4, r4, 95
+; P9LE-NEXT:    ori r5, r5, 63421
 ; P9LE-NEXT:    subf r3, r4, r3
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    li r3, 2
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
+; P9LE-NEXT:    xxswapd v3, vs0
 ; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    extsw r4, r4
-; P9LE-NEXT:    ori r5, r5, 63421
 ; P9LE-NEXT:    mulld r5, r4, r5
 ; P9LE-NEXT:    rldicl r5, r5, 32, 32
 ; P9LE-NEXT:    subf r4, r4, r5
@@ -40,14 +41,15 @@ define <4 x i16> @fold_srem_vec_1(<4 x i16> %x) {
 ; P9LE-NEXT:    add r4, r4, r5
 ; P9LE-NEXT:    lis r5, 21399
 ; P9LE-NEXT:    mulli r4, r4, -124
+; P9LE-NEXT:    ori r5, r5, 33437
 ; P9LE-NEXT:    subf r3, r4, r3
-; P9LE-NEXT:    xxswapd v3, vs0
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    li r3, 4
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
+; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    extsh r4, r3
+; P9LE-NEXT:    vmrglh v3, v4, v3
 ; P9LE-NEXT:    extsw r4, r4
-; P9LE-NEXT:    ori r5, r5, 33437
 ; P9LE-NEXT:    mulld r4, r4, r5
 ; P9LE-NEXT:    rldicl r5, r4, 1, 63
 ; P9LE-NEXT:    rldicl r4, r4, 32, 32
@@ -55,14 +57,14 @@ define <4 x i16> @fold_srem_vec_1(<4 x i16> %x) {
 ; P9LE-NEXT:    add r4, r4, r5
 ; P9LE-NEXT:    lis r5, -16728
 ; P9LE-NEXT:    mulli r4, r4, 98
+; P9LE-NEXT:    ori r5, r5, 63249
 ; P9LE-NEXT:    subf r3, r4, r3
-; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    li r3, 6
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
+; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    extsw r4, r4
-; P9LE-NEXT:    ori r5, r5, 63249
 ; P9LE-NEXT:    mulld r4, r4, r5
 ; P9LE-NEXT:    rldicl r5, r4, 1, 63
 ; P9LE-NEXT:    rldicl r4, r4, 32, 32
@@ -70,8 +72,6 @@ define <4 x i16> @fold_srem_vec_1(<4 x i16> %x) {
 ; P9LE-NEXT:    add r4, r4, r5
 ; P9LE-NEXT:    mulli r4, r4, -1003
 ; P9LE-NEXT:    subf r3, r4, r3
-; P9LE-NEXT:    vmrglh v3, v4, v3
-; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    xxswapd v2, vs0
 ; P9LE-NEXT:    vmrglh v2, v2, v4
@@ -81,10 +81,10 @@ define <4 x i16> @fold_srem_vec_1(<4 x i16> %x) {
 ; P9BE-LABEL: fold_srem_vec_1:
 ; P9BE:       # %bb.0:
 ; P9BE-NEXT:    li r3, 2
-; P9BE-NEXT:    vextuhlx r3, r3, v2
-; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    lis r4, 31710
+; P9BE-NEXT:    vextuhlx r3, r3, v2
 ; P9BE-NEXT:    ori r4, r4, 63421
+; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    extsw r3, r3
 ; P9BE-NEXT:    mulld r4, r3, r4
 ; P9BE-NEXT:    rldicl r4, r4, 32, 32
@@ -96,12 +96,12 @@ define <4 x i16> @fold_srem_vec_1(<4 x i16> %x) {
 ; P9BE-NEXT:    subf r3, r4, r3
 ; P9BE-NEXT:    lis r4, -21386
 ; P9BE-NEXT:    sldi r3, r3, 48
+; P9BE-NEXT:    ori r4, r4, 37253
 ; P9BE-NEXT:    mtvsrd v3, r3
 ; P9BE-NEXT:    li r3, 0
 ; P9BE-NEXT:    vextuhlx r3, r3, v2
 ; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    extsw r3, r3
-; P9BE-NEXT:    ori r4, r4, 37253
 ; P9BE-NEXT:    mulld r4, r3, r4
 ; P9BE-NEXT:    rldicl r4, r4, 32, 32
 ; P9BE-NEXT:    add r4, r4, r3
@@ -112,12 +112,13 @@ define <4 x i16> @fold_srem_vec_1(<4 x i16> %x) {
 ; P9BE-NEXT:    subf r3, r4, r3
 ; P9BE-NEXT:    lis r4, -16728
 ; P9BE-NEXT:    sldi r3, r3, 48
+; P9BE-NEXT:    ori r4, r4, 63249
 ; P9BE-NEXT:    mtvsrd v4, r3
 ; P9BE-NEXT:    li r3, 6
 ; P9BE-NEXT:    vextuhlx r3, r3, v2
+; P9BE-NEXT:    vmrghh v3, v4, v3
 ; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    extsw r3, r3
-; P9BE-NEXT:    ori r4, r4, 63249
 ; P9BE-NEXT:    mulld r4, r3, r4
 ; P9BE-NEXT:    rldicl r5, r4, 1, 63
 ; P9BE-NEXT:    rldicl r4, r4, 32, 32
@@ -127,13 +128,12 @@ define <4 x i16> @fold_srem_vec_1(<4 x i16> %x) {
 ; P9BE-NEXT:    subf r3, r4, r3
 ; P9BE-NEXT:    lis r4, 21399
 ; P9BE-NEXT:    sldi r3, r3, 48
-; P9BE-NEXT:    vmrghh v3, v4, v3
+; P9BE-NEXT:    ori r4, r4, 33437
 ; P9BE-NEXT:    mtvsrd v4, r3
 ; P9BE-NEXT:    li r3, 4
 ; P9BE-NEXT:    vextuhlx r3, r3, v2
 ; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    extsw r3, r3
-; P9BE-NEXT:    ori r4, r4, 33437
 ; P9BE-NEXT:    mulld r4, r3, r4
 ; P9BE-NEXT:    rldicl r5, r4, 1, 63
 ; P9BE-NEXT:    rldicl r4, r4, 32, 32
@@ -289,10 +289,10 @@ define <4 x i16> @fold_srem_vec_2(<4 x i16> %x) {
 ; P9LE-LABEL: fold_srem_vec_2:
 ; P9LE:       # %bb.0:
 ; P9LE-NEXT:    li r3, 0
-; P9LE-NEXT:    vextuhrx r3, r3, v2
-; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    lis r5, -21386
+; P9LE-NEXT:    vextuhrx r3, r3, v2
 ; P9LE-NEXT:    ori r5, r5, 37253
+; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    extsw r4, r4
 ; P9LE-NEXT:    mulld r6, r4, r5
 ; P9LE-NEXT:    rldicl r6, r6, 32, 32
@@ -305,6 +305,7 @@ define <4 x i16> @fold_srem_vec_2(<4 x i16> %x) {
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    li r3, 2
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
+; P9LE-NEXT:    xxswapd v3, vs0
 ; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    extsw r4, r4
 ; P9LE-NEXT:    mulld r6, r4, r5
@@ -315,11 +316,12 @@ define <4 x i16> @fold_srem_vec_2(<4 x i16> %x) {
 ; P9LE-NEXT:    add r4, r4, r6
 ; P9LE-NEXT:    mulli r4, r4, 95
 ; P9LE-NEXT:    subf r3, r4, r3
-; P9LE-NEXT:    xxswapd v3, vs0
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    li r3, 4
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
+; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    extsh r4, r3
+; P9LE-NEXT:    vmrglh v3, v4, v3
 ; P9LE-NEXT:    extsw r4, r4
 ; P9LE-NEXT:    mulld r6, r4, r5
 ; P9LE-NEXT:    rldicl r6, r6, 32, 32
@@ -329,10 +331,10 @@ define <4 x i16> @fold_srem_vec_2(<4 x i16> %x) {
 ; P9LE-NEXT:    add r4, r4, r6
 ; P9LE-NEXT:    mulli r4, r4, 95
 ; P9LE-NEXT:    subf r3, r4, r3
-; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    li r3, 6
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
+; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    extsw r4, r4
 ; P9LE-NEXT:    mulld r5, r4, r5
@@ -343,8 +345,6 @@ define <4 x i16> @fold_srem_vec_2(<4 x i16> %x) {
 ; P9LE-NEXT:    add r4, r4, r5
 ; P9LE-NEXT:    mulli r4, r4, 95
 ; P9LE-NEXT:    subf r3, r4, r3
-; P9LE-NEXT:    vmrglh v3, v4, v3
-; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    xxswapd v2, vs0
 ; P9LE-NEXT:    vmrglh v2, v2, v4
@@ -354,10 +354,10 @@ define <4 x i16> @fold_srem_vec_2(<4 x i16> %x) {
 ; P9BE-LABEL: fold_srem_vec_2:
 ; P9BE:       # %bb.0:
 ; P9BE-NEXT:    li r3, 6
-; P9BE-NEXT:    vextuhlx r3, r3, v2
-; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    lis r4, -21386
+; P9BE-NEXT:    vextuhlx r3, r3, v2
 ; P9BE-NEXT:    ori r4, r4, 37253
+; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    extsw r3, r3
 ; P9BE-NEXT:    mulld r5, r3, r4
 ; P9BE-NEXT:    rldicl r5, r5, 32, 32
@@ -385,6 +385,7 @@ define <4 x i16> @fold_srem_vec_2(<4 x i16> %x) {
 ; P9BE-NEXT:    mtvsrd v4, r3
 ; P9BE-NEXT:    li r3, 2
 ; P9BE-NEXT:    vextuhlx r3, r3, v2
+; P9BE-NEXT:    vmrghh v3, v4, v3
 ; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    extsw r3, r3
 ; P9BE-NEXT:    mulld r5, r3, r4
@@ -396,7 +397,6 @@ define <4 x i16> @fold_srem_vec_2(<4 x i16> %x) {
 ; P9BE-NEXT:    mulli r5, r5, 95
 ; P9BE-NEXT:    subf r3, r5, r3
 ; P9BE-NEXT:    sldi r3, r3, 48
-; P9BE-NEXT:    vmrghh v3, v4, v3
 ; P9BE-NEXT:    mtvsrd v4, r3
 ; P9BE-NEXT:    li r3, 0
 ; P9BE-NEXT:    vextuhlx r3, r3, v2
@@ -552,10 +552,10 @@ define <4 x i16> @combine_srem_sdiv(<4 x i16> %x) {
 ; P9LE-LABEL: combine_srem_sdiv:
 ; P9LE:       # %bb.0:
 ; P9LE-NEXT:    li r3, 0
-; P9LE-NEXT:    vextuhrx r3, r3, v2
-; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    lis r5, -21386
+; P9LE-NEXT:    vextuhrx r3, r3, v2
 ; P9LE-NEXT:    ori r5, r5, 37253
+; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    extsw r4, r4
 ; P9LE-NEXT:    mulld r6, r4, r5
 ; P9LE-NEXT:    rldicl r6, r6, 32, 32
@@ -568,6 +568,7 @@ define <4 x i16> @combine_srem_sdiv(<4 x i16> %x) {
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    li r3, 2
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
+; P9LE-NEXT:    xxswapd v3, vs0
 ; P9LE-NEXT:    extsh r6, r3
 ; P9LE-NEXT:    extsw r6, r6
 ; P9LE-NEXT:    mulld r7, r6, r5
@@ -578,11 +579,12 @@ define <4 x i16> @combine_srem_sdiv(<4 x i16> %x) {
 ; P9LE-NEXT:    add r6, r6, r7
 ; P9LE-NEXT:    mulli r7, r6, 95
 ; P9LE-NEXT:    subf r3, r7, r3
-; P9LE-NEXT:    xxswapd v3, vs0
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    li r3, 4
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
+; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    extsh r7, r3
+; P9LE-NEXT:    vmrglh v3, v4, v3
 ; P9LE-NEXT:    extsw r7, r7
 ; P9LE-NEXT:    mulld r8, r7, r5
 ; P9LE-NEXT:    rldicl r8, r8, 32, 32
@@ -592,10 +594,10 @@ define <4 x i16> @combine_srem_sdiv(<4 x i16> %x) {
 ; P9LE-NEXT:    add r7, r7, r8
 ; P9LE-NEXT:    mulli r8, r7, 95
 ; P9LE-NEXT:    subf r3, r8, r3
-; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    li r3, 6
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
+; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    extsh r8, r3
 ; P9LE-NEXT:    extsw r8, r8
 ; P9LE-NEXT:    mulld r5, r8, r5
@@ -606,8 +608,6 @@ define <4 x i16> @combine_srem_sdiv(<4 x i16> %x) {
 ; P9LE-NEXT:    add r5, r5, r8
 ; P9LE-NEXT:    mulli r8, r5, 95
 ; P9LE-NEXT:    subf r3, r8, r3
-; P9LE-NEXT:    vmrglh v3, v4, v3
-; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    xxswapd v2, vs0
 ; P9LE-NEXT:    mtvsrd f0, r4
@@ -629,10 +629,10 @@ define <4 x i16> @combine_srem_sdiv(<4 x i16> %x) {
 ; P9BE-LABEL: combine_srem_sdiv:
 ; P9BE:       # %bb.0:
 ; P9BE-NEXT:    li r3, 6
-; P9BE-NEXT:    vextuhlx r3, r3, v2
-; P9BE-NEXT:    extsh r4, r3
 ; P9BE-NEXT:    lis r5, -21386
+; P9BE-NEXT:    vextuhlx r3, r3, v2
 ; P9BE-NEXT:    ori r5, r5, 37253
+; P9BE-NEXT:    extsh r4, r3
 ; P9BE-NEXT:    extsw r4, r4
 ; P9BE-NEXT:    mulld r6, r4, r5
 ; P9BE-NEXT:    rldicl r6, r6, 32, 32
@@ -660,6 +660,7 @@ define <4 x i16> @combine_srem_sdiv(<4 x i16> %x) {
 ; P9BE-NEXT:    mtvsrd v4, r3
 ; P9BE-NEXT:    li r3, 2
 ; P9BE-NEXT:    vextuhlx r3, r3, v2
+; P9BE-NEXT:    vmrghh v3, v4, v3
 ; P9BE-NEXT:    extsh r7, r3
 ; P9BE-NEXT:    extsw r7, r7
 ; P9BE-NEXT:    mulld r8, r7, r5
@@ -671,7 +672,6 @@ define <4 x i16> @combine_srem_sdiv(<4 x i16> %x) {
 ; P9BE-NEXT:    mulli r8, r7, 95
 ; P9BE-NEXT:    subf r3, r8, r3
 ; P9BE-NEXT:    sldi r3, r3, 48
-; P9BE-NEXT:    vmrghh v3, v4, v3
 ; P9BE-NEXT:    mtvsrd v4, r3
 ; P9BE-NEXT:    li r3, 0
 ; P9BE-NEXT:    vextuhlx r3, r3, v2
@@ -864,7 +864,9 @@ define <4 x i16> @dont_fold_srem_power_of_two(<4 x i16> %x) {
 ; P9LE-LABEL: dont_fold_srem_power_of_two:
 ; P9LE:       # %bb.0:
 ; P9LE-NEXT:    li r3, 0
+; P9LE-NEXT:    lis r5, -21386
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
+; P9LE-NEXT:    ori r5, r5, 37253
 ; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    srawi r4, r4, 6
 ; P9LE-NEXT:    addze r4, r4
@@ -873,19 +875,17 @@ define <4 x i16> @dont_fold_srem_power_of_two(<4 x i16> %x) {
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    li r3, 2
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
+; P9LE-NEXT:    xxswapd v3, vs0
 ; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    srawi r4, r4, 5
 ; P9LE-NEXT:    addze r4, r4
 ; P9LE-NEXT:    slwi r4, r4, 5
 ; P9LE-NEXT:    subf r3, r4, r3
-; P9LE-NEXT:    xxswapd v3, vs0
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    li r3, 6
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
-; P9LE-NEXT:    extsh r4, r3
-; P9LE-NEXT:    lis r5, -21386
-; P9LE-NEXT:    ori r5, r5, 37253
 ; P9LE-NEXT:    xxswapd v4, vs0
+; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    vmrglh v3, v4, v3
 ; P9LE-NEXT:    extsw r4, r4
 ; P9LE-NEXT:    mulld r5, r4, r5
@@ -899,12 +899,12 @@ define <4 x i16> @dont_fold_srem_power_of_two(<4 x i16> %x) {
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    li r3, 4
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
+; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    srawi r4, r4, 3
 ; P9LE-NEXT:    addze r4, r4
 ; P9LE-NEXT:    slwi r4, r4, 3
 ; P9LE-NEXT:    subf r3, r4, r3
-; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    xxswapd v2, vs0
 ; P9LE-NEXT:    vmrglh v2, v4, v2
@@ -931,12 +931,13 @@ define <4 x i16> @dont_fold_srem_power_of_two(<4 x i16> %x) {
 ; P9BE-NEXT:    subf r3, r4, r3
 ; P9BE-NEXT:    lis r4, -21386
 ; P9BE-NEXT:    sldi r3, r3, 48
+; P9BE-NEXT:    ori r4, r4, 37253
 ; P9BE-NEXT:    mtvsrd v4, r3
 ; P9BE-NEXT:    li r3, 6
 ; P9BE-NEXT:    vextuhlx r3, r3, v2
+; P9BE-NEXT:    vmrghh v3, v4, v3
 ; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    extsw r3, r3
-; P9BE-NEXT:    ori r4, r4, 37253
 ; P9BE-NEXT:    mulld r4, r3, r4
 ; P9BE-NEXT:    rldicl r4, r4, 32, 32
 ; P9BE-NEXT:    add r4, r4, r3
@@ -946,7 +947,6 @@ define <4 x i16> @dont_fold_srem_power_of_two(<4 x i16> %x) {
 ; P9BE-NEXT:    mulli r4, r4, 95
 ; P9BE-NEXT:    subf r3, r4, r3
 ; P9BE-NEXT:    sldi r3, r3, 48
-; P9BE-NEXT:    vmrghh v3, v4, v3
 ; P9BE-NEXT:    mtvsrd v4, r3
 ; P9BE-NEXT:    li r3, 4
 ; P9BE-NEXT:    vextuhlx r3, r3, v2
@@ -1064,27 +1064,29 @@ define <4 x i16> @dont_fold_srem_one(<4 x i16> %x) {
 ; P9LE-LABEL: dont_fold_srem_one:
 ; P9LE:       # %bb.0:
 ; P9LE-NEXT:    li r3, 2
-; P9LE-NEXT:    vextuhrx r3, r3, v2
-; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    lis r5, -14230
+; P9LE-NEXT:    xxlxor v4, v4, v4
+; P9LE-NEXT:    vextuhrx r3, r3, v2
 ; P9LE-NEXT:    ori r5, r5, 30865
+; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    extsw r4, r4
 ; P9LE-NEXT:    mulld r5, r4, r5
 ; P9LE-NEXT:    rldicl r5, r5, 32, 32
-; P9LE-NEXT:    xxlxor v4, v4, v4
 ; P9LE-NEXT:    add r4, r5, r4
 ; P9LE-NEXT:    srwi r5, r4, 31
 ; P9LE-NEXT:    srawi r4, r4, 9
 ; P9LE-NEXT:    add r4, r4, r5
 ; P9LE-NEXT:    lis r5, -19946
 ; P9LE-NEXT:    mulli r4, r4, 654
+; P9LE-NEXT:    ori r5, r5, 17097
 ; P9LE-NEXT:    subf r3, r4, r3
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    li r3, 4
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
+; P9LE-NEXT:    xxswapd v3, vs0
 ; P9LE-NEXT:    extsh r4, r3
+; P9LE-NEXT:    vmrglh v3, v3, v4
 ; P9LE-NEXT:    extsw r4, r4
-; P9LE-NEXT:    ori r5, r5, 17097
 ; P9LE-NEXT:    mulld r5, r4, r5
 ; P9LE-NEXT:    rldicl r5, r5, 32, 32
 ; P9LE-NEXT:    add r4, r5, r4
@@ -1093,14 +1095,14 @@ define <4 x i16> @dont_fold_srem_one(<4 x i16> %x) {
 ; P9LE-NEXT:    add r4, r4, r5
 ; P9LE-NEXT:    lis r5, 24749
 ; P9LE-NEXT:    mulli r4, r4, 23
+; P9LE-NEXT:    ori r5, r5, 47143
 ; P9LE-NEXT:    subf r3, r4, r3
-; P9LE-NEXT:    xxswapd v3, vs0
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    li r3, 6
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
+; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    extsw r4, r4
-; P9LE-NEXT:    ori r5, r5, 47143
 ; P9LE-NEXT:    mulld r4, r4, r5
 ; P9LE-NEXT:    rldicl r5, r4, 1, 63
 ; P9LE-NEXT:    rldicl r4, r4, 32, 32
@@ -1108,8 +1110,6 @@ define <4 x i16> @dont_fold_srem_one(<4 x i16> %x) {
 ; P9LE-NEXT:    add r4, r4, r5
 ; P9LE-NEXT:    mulli r4, r4, 5423
 ; P9LE-NEXT:    subf r3, r4, r3
-; P9LE-NEXT:    vmrglh v3, v3, v4
-; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    xxswapd v2, vs0
 ; P9LE-NEXT:    vmrglh v2, v2, v4
@@ -1119,10 +1119,10 @@ define <4 x i16> @dont_fold_srem_one(<4 x i16> %x) {
 ; P9BE-LABEL: dont_fold_srem_one:
 ; P9BE:       # %bb.0:
 ; P9BE-NEXT:    li r3, 4
-; P9BE-NEXT:    vextuhlx r3, r3, v2
-; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    lis r4, -19946
+; P9BE-NEXT:    vextuhlx r3, r3, v2
 ; P9BE-NEXT:    ori r4, r4, 17097
+; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    extsw r3, r3
 ; P9BE-NEXT:    mulld r4, r3, r4
 ; P9BE-NEXT:    rldicl r4, r4, 32, 32
@@ -1134,12 +1134,12 @@ define <4 x i16> @dont_fold_srem_one(<4 x i16> %x) {
 ; P9BE-NEXT:    subf r3, r4, r3
 ; P9BE-NEXT:    lis r4, 24749
 ; P9BE-NEXT:    sldi r3, r3, 48
+; P9BE-NEXT:    ori r4, r4, 47143
 ; P9BE-NEXT:    mtvsrd v3, r3
 ; P9BE-NEXT:    li r3, 6
 ; P9BE-NEXT:    vextuhlx r3, r3, v2
 ; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    extsw r3, r3
-; P9BE-NEXT:    ori r4, r4, 47143
 ; P9BE-NEXT:    mulld r4, r3, r4
 ; P9BE-NEXT:    rldicl r5, r4, 1, 63
 ; P9BE-NEXT:    rldicl r4, r4, 32, 32
@@ -1149,12 +1149,13 @@ define <4 x i16> @dont_fold_srem_one(<4 x i16> %x) {
 ; P9BE-NEXT:    subf r3, r4, r3
 ; P9BE-NEXT:    lis r4, -14230
 ; P9BE-NEXT:    sldi r3, r3, 48
+; P9BE-NEXT:    ori r4, r4, 30865
 ; P9BE-NEXT:    mtvsrd v4, r3
 ; P9BE-NEXT:    li r3, 2
 ; P9BE-NEXT:    vextuhlx r3, r3, v2
+; P9BE-NEXT:    vmrghh v3, v3, v4
 ; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    extsw r3, r3
-; P9BE-NEXT:    ori r4, r4, 30865
 ; P9BE-NEXT:    mulld r4, r3, r4
 ; P9BE-NEXT:    rldicl r4, r4, 32, 32
 ; P9BE-NEXT:    add r4, r4, r3
@@ -1167,7 +1168,6 @@ define <4 x i16> @dont_fold_srem_one(<4 x i16> %x) {
 ; P9BE-NEXT:    mtvsrd v2, r3
 ; P9BE-NEXT:    li r3, 0
 ; P9BE-NEXT:    sldi r3, r3, 48
-; P9BE-NEXT:    vmrghh v3, v3, v4
 ; P9BE-NEXT:    mtvsrd v4, r3
 ; P9BE-NEXT:    vmrghh v2, v4, v2
 ; P9BE-NEXT:    vmrghw v2, v2, v3
@@ -1290,10 +1290,10 @@ define <4 x i16> @dont_fold_urem_i16_smax(<4 x i16> %x) {
 ; P9LE-LABEL: dont_fold_urem_i16_smax:
 ; P9LE:       # %bb.0:
 ; P9LE-NEXT:    li r3, 4
-; P9LE-NEXT:    vextuhrx r3, r3, v2
-; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    lis r5, -19946
+; P9LE-NEXT:    vextuhrx r3, r3, v2
 ; P9LE-NEXT:    ori r5, r5, 17097
+; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    extsw r4, r4
 ; P9LE-NEXT:    mulld r5, r4, r5
 ; P9LE-NEXT:    rldicl r5, r5, 32, 32
@@ -1303,13 +1303,14 @@ define <4 x i16> @dont_fold_urem_i16_smax(<4 x i16> %x) {
 ; P9LE-NEXT:    add r4, r4, r5
 ; P9LE-NEXT:    lis r5, 24749
 ; P9LE-NEXT:    mulli r4, r4, 23
+; P9LE-NEXT:    ori r5, r5, 47143
 ; P9LE-NEXT:    subf r3, r4, r3
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    li r3, 6
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
+; P9LE-NEXT:    xxswapd v3, vs0
 ; P9LE-NEXT:    extsh r4, r3
 ; P9LE-NEXT:    extsw r4, r4
-; P9LE-NEXT:    ori r5, r5, 47143
 ; P9LE-NEXT:    mulld r4, r4, r5
 ; P9LE-NEXT:    rldicl r5, r4, 1, 63
 ; P9LE-NEXT:    rldicl r4, r4, 32, 32
@@ -1317,20 +1318,19 @@ define <4 x i16> @dont_fold_urem_i16_smax(<4 x i16> %x) {
 ; P9LE-NEXT:    add r4, r4, r5
 ; P9LE-NEXT:    mulli r4, r4, 5423
 ; P9LE-NEXT:    subf r3, r4, r3
-; P9LE-NEXT:    xxswapd v3, vs0
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    li r3, 2
 ; P9LE-NEXT:    vextuhrx r3, r3, v2
+; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    extsh r4, r3
+; P9LE-NEXT:    vmrglh v3, v4, v3
+; P9LE-NEXT:    xxlxor v4, v4, v4
 ; P9LE-NEXT:    srawi r4, r4, 15
 ; P9LE-NEXT:    addze r4, r4
 ; P9LE-NEXT:    slwi r4, r4, 15
 ; P9LE-NEXT:    subf r3, r4, r3
-; P9LE-NEXT:    xxswapd v4, vs0
 ; P9LE-NEXT:    mtvsrd f0, r3
 ; P9LE-NEXT:    xxswapd v2, vs0
-; P9LE-NEXT:    vmrglh v3, v4, v3
-; P9LE-NEXT:    xxlxor v4, v4, v4
 ; P9LE-NEXT:    vmrglh v2, v2, v4
 ; P9LE-NEXT:    vmrglw v2, v3, v2
 ; P9LE-NEXT:    blr
@@ -1338,10 +1338,10 @@ define <4 x i16> @dont_fold_urem_i16_smax(<4 x i16> %x) {
 ; P9BE-LABEL: dont_fold_urem_i16_smax:
 ; P9BE:       # %bb.0:
 ; P9BE-NEXT:    li r3, 4
-; P9BE-NEXT:    vextuhlx r3, r3, v2
-; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    lis r4, -19946
+; P9BE-NEXT:    vextuhlx r3, r3, v2
 ; P9BE-NEXT:    ori r4, r4, 17097
+; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    extsw r3, r3
 ; P9BE-NEXT:    mulld r4, r3, r4
 ; P9BE-NEXT:    rldicl r4, r4, 32, 32
@@ -1353,12 +1353,12 @@ define <4 x i16> @dont_fold_urem_i16_smax(<4 x i16> %x) {
 ; P9BE-NEXT:    subf r3, r4, r3
 ; P9BE-NEXT:    lis r4, 24749
 ; P9BE-NEXT:    sldi r3, r3, 48
+; P9BE-NEXT:    ori r4, r4, 47143
 ; P9BE-NEXT:    mtvsrd v3, r3
 ; P9BE-NEXT:    li r3, 6
 ; P9BE-NEXT:    vextuhlx r3, r3, v2
 ; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    extsw r3, r3
-; P9BE-NEXT:    ori r4, r4, 47143
 ; P9BE-NEXT:    mulld r4, r3, r4
 ; P9BE-NEXT:    rldicl r5, r4, 1, 63
 ; P9BE-NEXT:    rldicl r4, r4, 32, 32
@@ -1370,6 +1370,7 @@ define <4 x i16> @dont_fold_urem_i16_smax(<4 x i16> %x) {
 ; P9BE-NEXT:    mtvsrd v4, r3
 ; P9BE-NEXT:    li r3, 2
 ; P9BE-NEXT:    vextuhlx r3, r3, v2
+; P9BE-NEXT:    vmrghh v3, v3, v4
 ; P9BE-NEXT:    extsh r3, r3
 ; P9BE-NEXT:    srawi r4, r3, 15
 ; P9BE-NEXT:    addze r4, r4
@@ -1379,7 +1380,6 @@ define <4 x i16> @dont_fold_urem_i16_smax(<4 x i16> %x) {
 ; P9BE-NEXT:    mtvsrd v2, r3
 ; P9BE-NEXT:    li r3, 0
 ; P9BE-NEXT:    sldi r3, r3, 48
-; P9BE-NEXT:    vmrghh v3, v3, v4
 ; P9BE-NEXT:    mtvsrd v4, r3
 ; P9BE-NEXT:    vmrghh v2, v4, v2
 ; P9BE-NEXT:    vmrghw v2, v2, v3
@@ -1488,10 +1488,10 @@ define <4 x i64> @dont_fold_srem_i64(<4 x i64> %x) {
 ; P9LE-LABEL: dont_fold_srem_i64:
 ; P9LE:       # %bb.0:
 ; P9LE-NEXT:    lis r4, 24749
+; P9LE-NEXT:    mfvsrd r3, v3
 ; P9LE-NEXT:    ori r4, r4, 47142
 ; P9LE-NEXT:    sldi r4, r4, 32
 ; P9LE-NEXT:    oris r4, r4, 58853
-; P9LE-NEXT:    mfvsrd r3, v3
 ; P9LE-NEXT:    ori r4, r4, 6055
 ; P9LE-NEXT:    mulhd r4, r3, r4
 ; P9LE-NEXT:    rldicl r5, r4, 1, 63
@@ -1514,10 +1514,10 @@ define <4 x i64> @dont_fold_srem_i64(<4 x i64> %x) {
 ; P9LE-NEXT:    sub r4, r4, r5
 ; P9LE-NEXT:    mtvsrdd v3, r3, r4
 ; P9LE-NEXT:    lis r4, 25653
+; P9LE-NEXT:    mfvsrd r3, v2
 ; P9LE-NEXT:    ori r4, r4, 15432
 ; P9LE-NEXT:    sldi r4, r4, 32
 ; P9LE-NEXT:    oris r4, r4, 1603
-; P9LE-NEXT:    mfvsrd r3, v2
 ; P9LE-NEXT:    ori r4, r4, 21445
 ; P9LE-NEXT:    mulhd r4, r3, r4
 ; P9LE-NEXT:    rldicl r5, r4, 1, 63
@@ -1532,10 +1532,10 @@ define <4 x i64> @dont_fold_srem_i64(<4 x i64> %x) {
 ; P9BE-LABEL: dont_fold_srem_i64:
 ; P9BE:       # %bb.0:
 ; P9BE-NEXT:    lis r4, 24749
+; P9BE-NEXT:    mfvsrld r3, v3
 ; P9BE-NEXT:    ori r4, r4, 47142
 ; P9BE-NEXT:    sldi r4, r4, 32
 ; P9BE-NEXT:    oris r4, r4, 58853
-; P9BE-NEXT:    mfvsrld r3, v3
 ; P9BE-NEXT:    ori r4, r4, 6055
 ; P9BE-NEXT:    mulhd r4, r3, r4
 ; P9BE-NEXT:    rldicl r5, r4, 1, 63
@@ -1558,10 +1558,10 @@ define <4 x i64> @dont_fold_srem_i64(<4 x i64> %x) {
 ; P9BE-NEXT:    sub r4, r4, r5
 ; P9BE-NEXT:    mtvsrdd v3, r4, r3
 ; P9BE-NEXT:    lis r4, 25653
+; P9BE-NEXT:    mfvsrld r3, v2
 ; P9BE-NEXT:    ori r4, r4, 15432
 ; P9BE-NEXT:    sldi r4, r4, 32
 ; P9BE-NEXT:    oris r4, r4, 1603
-; P9BE-NEXT:    mfvsrld r3, v2
 ; P9BE-NEXT:    ori r4, r4, 21445
 ; P9BE-NEXT:    mulhd r4, r3, r4
 ; P9BE-NEXT:    rldicl r5, r4, 1, 63

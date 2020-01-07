@@ -4,6 +4,7 @@
 ;CHECK-LABEL: {{^}}test1:
 ;CHECK-NOT: s_waitcnt
 ;CHECK: buffer_atomic_swap v0, off, s[0:3], 0 glc
+;SICI: v_mov_b32_e32 v3, 0x2000
 ;VI: s_movk_i32 [[SOFS:s[0-9]+]], 0x1ffc
 ;CHECK: s_waitcnt vmcnt(0)
 ;CHECK: buffer_atomic_swap v0, v1, s[0:3], 0 idxen glc
@@ -14,7 +15,7 @@
 ;CHECK: s_waitcnt vmcnt(0)
 ;CHECK: buffer_atomic_swap v0, v2, s[0:3], 0 offen offset:42 glc
 ;CHECK-DAG: s_waitcnt vmcnt(0)
-;SICI: buffer_atomic_swap v0, v1, s[0:3], 0 offen glc
+;SICI: buffer_atomic_swap v0, v3, s[0:3], 0 offen glc
 ;VI: buffer_atomic_swap v0, off, s[0:3], [[SOFS]] offset:4 glc
 ;CHECK: s_waitcnt vmcnt(0)
 ;CHECK: buffer_atomic_swap v0, off, s[0:3], 0{{$}}

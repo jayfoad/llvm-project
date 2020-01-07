@@ -29,19 +29,19 @@ define amdgpu_kernel void @test_bswap_i32(i32 addrspace(1)* %out, i32 addrspace(
 ;
 ; VI-LABEL: test_bswap_i32:
 ; VI:       ; %bb.0:
-; VI-NEXT:    s_load_dwordx4 s[4:7], s[0:1], 0x24
-; VI-NEXT:    s_mov_b32 s3, 0xf000
-; VI-NEXT:    s_mov_b32 s2, -1
+; VI-NEXT:    s_load_dwordx4 s[0:3], s[0:1], 0x24
+; VI-NEXT:    s_mov_b32 s7, 0xf000
+; VI-NEXT:    s_mov_b32 s6, -1
 ; VI-NEXT:    s_waitcnt lgkmcnt(0)
-; VI-NEXT:    s_mov_b32 s0, s4
-; VI-NEXT:    s_load_dword s4, s[6:7], 0x0
-; VI-NEXT:    s_mov_b32 s1, s5
+; VI-NEXT:    s_load_dword s2, s[2:3], 0x0
+; VI-NEXT:    s_mov_b32 s4, s0
+; VI-NEXT:    s_mov_b32 s0, 0xff00ff
+; VI-NEXT:    s_mov_b32 s5, s1
 ; VI-NEXT:    s_waitcnt lgkmcnt(0)
-; VI-NEXT:    v_alignbit_b32 v0, s4, s4, 8
-; VI-NEXT:    v_alignbit_b32 v1, s4, s4, 24
-; VI-NEXT:    s_mov_b32 s4, 0xff00ff
-; VI-NEXT:    v_bfi_b32 v0, s4, v1, v0
-; VI-NEXT:    buffer_store_dword v0, off, s[0:3], 0
+; VI-NEXT:    v_alignbit_b32 v0, s2, s2, 8
+; VI-NEXT:    v_alignbit_b32 v1, s2, s2, 24
+; VI-NEXT:    v_bfi_b32 v0, s0, v1, v0
+; VI-NEXT:    buffer_store_dword v0, off, s[4:7], 0
 ; VI-NEXT:    s_endpgm
   %val = load i32, i32 addrspace(1)* %in, align 4
   %bswap = call i32 @llvm.bswap.i32(i32 %val) nounwind readnone

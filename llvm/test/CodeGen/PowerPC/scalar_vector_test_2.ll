@@ -67,11 +67,11 @@ define <1 x float>* @test_liwzx2(<1 x float>* %A, <1 x float>* %B, <1 x float>* 
 ; P9LE:       # %bb.0:
 ; P9LE-NEXT:    lfiwzx f0, 0, r3
 ; P9LE-NEXT:    lfiwzx f1, 0, r4
+; P9LE-NEXT:    mr r3, r5
 ; P9LE-NEXT:    xxpermdi vs0, f0, f0, 2
 ; P9LE-NEXT:    xxpermdi vs1, f1, f1, 2
 ; P9LE-NEXT:    xvsubsp vs0, vs0, vs1
 ; P9LE-NEXT:    xxsldwi vs0, vs0, vs0, 2
-; P9LE-NEXT:    mr r3, r5
 ; P9LE-NEXT:    stfiwx f0, 0, r5
 ; P9LE-NEXT:    blr
 ;
@@ -79,11 +79,11 @@ define <1 x float>* @test_liwzx2(<1 x float>* %A, <1 x float>* %B, <1 x float>* 
 ; P9BE:       # %bb.0:
 ; P9BE-NEXT:    lfiwzx f0, 0, r3
 ; P9BE-NEXT:    lfiwzx f1, 0, r4
+; P9BE-NEXT:    mr r3, r5
 ; P9BE-NEXT:    xxsldwi vs0, f0, f0, 1
 ; P9BE-NEXT:    xxsldwi vs1, f1, f1, 1
 ; P9BE-NEXT:    xvsubsp vs0, vs0, vs1
 ; P9BE-NEXT:    xxsldwi vs0, vs0, vs0, 3
-; P9BE-NEXT:    mr r3, r5
 ; P9BE-NEXT:    stfiwx f0, 0, r5
 ; P9BE-NEXT:    blr
 ;

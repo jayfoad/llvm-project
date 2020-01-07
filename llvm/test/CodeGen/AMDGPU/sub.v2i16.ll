@@ -88,14 +88,14 @@ define amdgpu_kernel void @s_test_sub_v2i16(<2 x i16> addrspace(1)* %out, <2 x i
 ; VI-NEXT:    s_mov_b32 s2, -1
 ; VI-NEXT:    s_waitcnt lgkmcnt(0)
 ; VI-NEXT:    s_mov_b32 s0, s4
-; VI-NEXT:    s_mov_b32 s1, s5
 ; VI-NEXT:    s_load_dword s4, s[6:7], 0x0
-; VI-NEXT:    s_load_dword s5, s[8:9], 0x0
+; VI-NEXT:    s_load_dword s6, s[8:9], 0x0
+; VI-NEXT:    s_mov_b32 s1, s5
 ; VI-NEXT:    s_waitcnt lgkmcnt(0)
-; VI-NEXT:    s_lshr_b32 s6, s4, 16
-; VI-NEXT:    s_lshr_b32 s7, s5, 16
-; VI-NEXT:    s_sub_i32 s4, s4, s5
-; VI-NEXT:    s_sub_i32 s5, s6, s7
+; VI-NEXT:    s_lshr_b32 s5, s4, 16
+; VI-NEXT:    s_lshr_b32 s7, s6, 16
+; VI-NEXT:    s_sub_i32 s4, s4, s6
+; VI-NEXT:    s_sub_i32 s5, s5, s7
 ; VI-NEXT:    s_and_b32 s4, s4, 0xffff
 ; VI-NEXT:    s_lshl_b32 s5, s5, 16
 ; VI-NEXT:    s_or_b32 s4, s4, s5

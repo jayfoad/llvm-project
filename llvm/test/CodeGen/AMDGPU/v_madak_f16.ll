@@ -105,32 +105,32 @@ define amdgpu_kernel void @madak_f16_use_2(
 ; VI-LABEL: madak_f16_use_2:
 ; VI:       ; %bb.0: ; %entry
 ; VI-NEXT:    s_load_dwordx8 s[4:11], s[0:1], 0x24
-; VI-NEXT:    s_load_dwordx2 s[12:13], s[0:1], 0x44
-; VI-NEXT:    s_mov_b32 s3, 0xf000
-; VI-NEXT:    s_mov_b32 s2, -1
-; VI-NEXT:    s_mov_b32 s14, s2
+; VI-NEXT:    s_load_dwordx2 s[0:1], s[0:1], 0x44
+; VI-NEXT:    s_mov_b32 s15, 0xf000
+; VI-NEXT:    s_mov_b32 s14, -1
+; VI-NEXT:    s_mov_b32 s2, s14
 ; VI-NEXT:    s_waitcnt lgkmcnt(0)
 ; VI-NEXT:    s_mov_b32 s16, s10
 ; VI-NEXT:    s_mov_b32 s17, s11
-; VI-NEXT:    s_mov_b32 s15, s3
-; VI-NEXT:    s_mov_b32 s18, s2
-; VI-NEXT:    s_mov_b32 s19, s3
-; VI-NEXT:    s_mov_b32 s10, s2
-; VI-NEXT:    s_mov_b32 s11, s3
+; VI-NEXT:    s_mov_b32 s3, s15
+; VI-NEXT:    s_mov_b32 s18, s14
+; VI-NEXT:    s_mov_b32 s19, s15
+; VI-NEXT:    s_mov_b32 s10, s14
+; VI-NEXT:    s_mov_b32 s11, s15
 ; VI-NEXT:    buffer_load_ushort v0, off, s[8:11], 0
 ; VI-NEXT:    buffer_load_ushort v1, off, s[16:19], 0
-; VI-NEXT:    buffer_load_ushort v3, off, s[12:15], 0
-; VI-NEXT:    v_mov_b32_e32 v2, 0x4900
-; VI-NEXT:    s_mov_b32 s0, s6
-; VI-NEXT:    s_mov_b32 s1, s7
-; VI-NEXT:    s_mov_b32 s6, s2
-; VI-NEXT:    s_mov_b32 s7, s3
+; VI-NEXT:    buffer_load_ushort v2, off, s[0:3], 0
+; VI-NEXT:    v_mov_b32_e32 v3, 0x4900
+; VI-NEXT:    s_mov_b32 s12, s6
+; VI-NEXT:    s_mov_b32 s13, s7
+; VI-NEXT:    s_mov_b32 s6, s14
+; VI-NEXT:    s_mov_b32 s7, s15
 ; VI-NEXT:    s_waitcnt vmcnt(1)
 ; VI-NEXT:    v_madak_f16 v1, v0, v1, 0x4900
 ; VI-NEXT:    s_waitcnt vmcnt(0)
-; VI-NEXT:    v_mac_f16_e32 v2, v0, v3
+; VI-NEXT:    v_mac_f16_e32 v3, v0, v2
 ; VI-NEXT:    buffer_store_short v1, off, s[4:7], 0
-; VI-NEXT:    buffer_store_short v2, off, s[0:3], 0
+; VI-NEXT:    buffer_store_short v3, off, s[12:15], 0
 ; VI-NEXT:    s_endpgm
     half addrspace(1)* %r0,
     half addrspace(1)* %r1,
