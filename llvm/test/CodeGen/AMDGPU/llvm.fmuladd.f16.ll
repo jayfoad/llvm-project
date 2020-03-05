@@ -11,7 +11,7 @@ declare <2 x half> @llvm.fmuladd.v2f16(<2 x half> %a, <2 x half> %b, <2 x half> 
 ; GCN-LABEL: {{^}}fmuladd_f16
 ; GCN: buffer_load_ushort v[[A_F16:[0-9]+]]
 ; GCN: buffer_load_ushort v[[B_F16:[0-9]+]]
-; GCN: buffer_load_ushort v[[C_F16:[0-9]+]]
+; GCN-DAG: buffer_load_ushort v[[C_F16:[0-9]+]]
 ; SI:  v_cvt_f32_f16_e32 v[[A_F32:[0-9]+]], v[[A_F16]]
 ; SI:  v_cvt_f32_f16_e32 v[[B_F32:[0-9]+]], v[[B_F16]]
 ; SI:  v_cvt_f32_f16_e32 v[[C_F32:[0-9]+]], v[[C_F16]]
@@ -25,7 +25,7 @@ declare <2 x half> @llvm.fmuladd.v2f16(<2 x half> %a, <2 x half> %b, <2 x half> 
 ; VI-DENORM: v_fma_f16 [[RESULT:v[0-9]+]], v[[A_F16]], v[[B_F16]], v[[C_F16]]
 ; VI-DENORM: buffer_store_short [[RESULT]]
 
-; GFX10-FLUSH: v_mul_f16_e32 [[MUL:v[0-9]+]], v[[A_F16]], v[[B_F16]]
+; GFX10-FLUSH-DAG: v_mul_f16_e32 [[MUL:v[0-9]+]], v[[A_F16]], v[[B_F16]]
 ; GFX10-FLUSH: v_add_f16_e32 [[ADD:v[0-9]+]], [[MUL]], v[[C_F16]]
 ; GFX10-FLUSH: buffer_store_short [[ADD]]
 
@@ -131,7 +131,7 @@ define amdgpu_kernel void @fmuladd_f16_imm_b(
 
 ; GFX10: buffer_load_dword v[[A_V2_F16:[0-9]+]]
 ; GFX10: buffer_load_dword v[[B_V2_F16:[0-9]+]]
-; GFX10: buffer_load_dword v[[C_V2_F16:[0-9]+]]
+; GFX10-DAG: buffer_load_dword v[[C_V2_F16:[0-9]+]]
 
 ; SI: v_cvt_f32_f16_e32 v[[A_F32_0:[0-9]+]], v[[A_V2_F16]]
 ; SI: v_lshrrev_b32_e32 v[[B_F16_1:[0-9]+]], 16, v[[B_V2_F16]]
@@ -167,7 +167,7 @@ define amdgpu_kernel void @fmuladd_f16_imm_b(
 ; VI-DENORM-NOT: v_and_b32
 ; VI-DENORM: v_or_b32_e32 v[[R_V2_F16:[0-9]+]], v[[RES0]], v[[R_F16_HI]]
 
-; GFX10-FLUSH: v_pk_mul_f16 [[MUL:v[0-9]+]], v[[A_V2_F16]], v[[B_V2_F16]]
+; GFX10-FLUSH-DAG: v_pk_mul_f16 [[MUL:v[0-9]+]], v[[A_V2_F16]], v[[B_V2_F16]]
 ; GFX10-FLUSH: v_pk_add_f16 v[[R_V2_F16:[0-9]+]], [[MUL]], v[[C_V2_F16]]
 
 ; GFX10-DENORM: v_pk_fma_f16 v[[R_V2_F16:[0-9]+]], v[[A_V2_F16]], v[[B_V2_F16]], v[[C_V2_F16]]

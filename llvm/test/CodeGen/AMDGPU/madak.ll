@@ -238,12 +238,12 @@ define amdgpu_kernel void @no_madak_src1_modifier_f32(float addrspace(1)* noalia
 ; GCN-LABEL: {{^}}madak_constant_bus_violation:
 ; GCN:       s_load_dword [[SGPR0:s[0-9]+]], s{{\[[0-9]+:[0-9]+\]}}, {{0x12|0x48}}
 
-; GCN:       {{buffer|flat|global}}_load_dword [[VGPR:v[0-9]+]]
+; GCN-DAG:   {{buffer|flat|global}}_load_dword [[VGPR:v[0-9]+]]
 ; MAD:       v_mov_b32_e32 [[MADAK:v[0-9]+]], 0x42280000
 ; MAD:       v_mac_f32_e64 [[MADAK]], [[SGPR0]], 0.5
-; GFX10:     v_mov_b32_e32 [[SGPR0_VCOPY:v[0-9]+]], [[SGPR0]]
-; GFX10-MAD: v_madak_f32 [[MADAK:v[0-9]+]], 0.5, [[SGPR0_VCOPY]], 0x42280000
-; FMA:       v_fmaak_f32 [[MADAK:v[0-9]+]], 0.5, [[SGPR0_VCOPY]], 0x42280000
+; GFX10-DAG: v_mov_b32_e32 [[SGPR0_VCOPY:v[0-9]+]], [[SGPR0]]
+; GFX10-MAD-DAG: v_madak_f32 [[MADAK:v[0-9]+]], 0.5, [[SGPR0_VCOPY]], 0x42280000
+; FMA-DAG:   v_fmaak_f32 [[MADAK:v[0-9]+]], 0.5, [[SGPR0_VCOPY]], 0x42280000
 ; GCN:       v_mul_f32_e32 [[MUL:v[0-9]+]], [[MADAK]], [[VGPR]]
 ; GFX6:      buffer_store_dword [[MUL]]
 ; GFX8_9_10: {{flat|global}}_store_dword v[{{[0-9:]+}}], [[MUL]]

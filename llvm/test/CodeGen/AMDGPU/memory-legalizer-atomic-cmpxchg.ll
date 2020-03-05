@@ -3088,9 +3088,8 @@ entry:
 ; GCN-NOT:       s_waitcnt_v{{[ms]}}cnt {{[^,]+, (0x)*0$}}
 ; GCN:           flat_atomic_cmpswap v{{[0-9]+}}, v[{{[0-9]+\:[0-9]+}}], v[{{[0-9]+}}:{{[0-9]+}}]{{( offset:[0-9]+)*}} glc{{$}}
 ; GFX8:          s_waitcnt vmcnt(0){{$}}
-; GFX10WGP-NEXT: s_waitcnt vmcnt(0) lgkmcnt(0){{$}}
+; GFX10-NEXT:    s_waitcnt vmcnt(0) lgkmcnt(0){{$}}
 ; GFX10WGP-NEXT: buffer_gl0_inv
-; GFX10CU:       s_waitcnt vmcnt(0){{$}}
 ; GFX10CU-NOT:   buffer_gl0_inv
 ; GFX8-NOT:      buffer_wbinvl1_vol
 ; GFX10:         .amdhsa_kernel workgroup_acquire_monotonic_ret
@@ -3115,8 +3114,7 @@ entry:
 ; GFX10CU-NOT:   s_waitcnt_vscnt null, 0x0{{$}}
 ; GCN:           flat_atomic_cmpswap v{{[0-9]+}}, v[{{[0-9]+\:[0-9]+}}], v[{{[0-9]+}}:{{[0-9]+}}]{{( offset:[0-9]+)*}} glc{{$}}
 ; GFX8:          s_waitcnt vmcnt(0){{$}}
-; GFX10WGP-NEXT: s_waitcnt vmcnt(0) lgkmcnt(0){{$}}
-; GFX10CU:       s_waitcnt vmcnt(0){{$}}
+; GFX10-NEXT:    s_waitcnt vmcnt(0) lgkmcnt(0){{$}}
 ; GFX8-NOT:      buffer_wbinvl1_vol
 ; GFX10WGP-NEXT: buffer_gl0_inv
 ; GFX10CU-NOT:   buffer_gl0_inv
@@ -3142,8 +3140,7 @@ entry:
 ; GFX10CU-NOT:   s_waitcnt_vscnt null, 0x0{{$}}
 ; GCN:           flat_atomic_cmpswap v{{[0-9]+}}, v[{{[0-9]+\:[0-9]+}}], v[{{[0-9]+}}:{{[0-9]+}}]{{( offset:[0-9]+)*}} glc{{$}}
 ; GFX8:          s_waitcnt vmcnt(0){{$}}
-; GFX10WGP-NEXT: s_waitcnt vmcnt(0) lgkmcnt(0){{$}}
-; GFX10CU:       s_waitcnt vmcnt(0){{$}}
+; GFX10-NEXT:    s_waitcnt vmcnt(0) lgkmcnt(0){{$}}
 ; GFX8-NOT:      buffer_wbinvl1_vol
 ; GFX10WGP-NEXT: buffer_gl0_inv
 ; GFX10CU-NOT:   buffer_gl0_inv
@@ -3166,9 +3163,8 @@ entry:
 ; GCN-NOT:       s_waitcnt_v{{[ms]}}cnt {{[^,]+, (0x)*0$}}
 ; GCN:           flat_atomic_cmpswap v{{[0-9]+}}, v[{{[0-9]+\:[0-9]+}}], v[{{[0-9]+}}:{{[0-9]+}}]{{( offset:[0-9]+)*}} glc{{$}}
 ; GFX8:          s_waitcnt vmcnt(0){{$}}
-; GFX10WGP-NEXT: s_waitcnt vmcnt(0) lgkmcnt(0){{$}}
+; GFX10-NEXT:    s_waitcnt vmcnt(0) lgkmcnt(0){{$}}
 ; GFX10WGP-NEXT: buffer_gl0_inv
-; GFX10CU:       s_waitcnt vmcnt(0){{$}}
 ; GFX10CU-NOT:   buffer_gl0_inv
 ; GFX8-NOT:      buffer_wbinvl1_vol
 ; GFX10:         .amdhsa_kernel workgroup_acquire_acquire_ret
@@ -3194,8 +3190,7 @@ entry:
 ; GFX10CU-NOT:   s_waitcnt_vscnt null, 0x0{{$}}
 ; GFX10:         flat_atomic_cmpswap v{{[0-9]+}}, v[{{[0-9]+\:[0-9]+}}], v[{{[0-9]+}}:{{[0-9]+}}]{{( offset:[0-9]+)*}} glc{{$}}
 ; GFX8:          s_waitcnt vmcnt(0){{$}}
-; GFX10WGP-NEXT: s_waitcnt vmcnt(0) lgkmcnt(0){{$}}
-; GFX10CU:       s_waitcnt vmcnt(0){{$}}
+; GFX10-NEXT:    s_waitcnt vmcnt(0) lgkmcnt(0){{$}}
 ; GFX8-NOT:      buffer_wbinvl1_vol
 ; GFX10WGP-NEXT: buffer_gl0_inv
 ; GFX10CU-NOT:   buffer_gl0_inv
@@ -3220,8 +3215,7 @@ entry:
 ; GFX10CU-NOT:   s_waitcnt vmcnt(0){{$}}
 ; GFX10CU-NOT:   s_waitcnt_vscnt null, 0x0{{$}}
 ; GCN:           flat_atomic_cmpswap v{{[0-9]+}}, v[{{[0-9]+\:[0-9]+}}], v[{{[0-9]+}}:{{[0-9]+}}]{{( offset:[0-9]+)*}} glc{{$}}
-; GFX10WGP-NEXT: s_waitcnt vmcnt(0) lgkmcnt(0){{$}}
-; GFX10CU:       s_waitcnt vmcnt(0){{$}}
+; GFX10-NEXT:    s_waitcnt vmcnt(0) lgkmcnt(0){{$}}
 ; GFX8-NOT:      buffer_wbinvl1_vol
 ; GFX10WGP:      buffer_gl0_inv
 ; GFX10CU-NOT:   buffer_gl0_inv
@@ -3246,8 +3240,7 @@ entry:
 ; GFX10CU-NOT:   s_waitcnt vmcnt(0){{$}}
 ; GFX10CU-NOT:   s_waitcnt_vscnt null, 0x0{{$}}
 ; GCN:           flat_atomic_cmpswap v{{[0-9]+}}, v[{{[0-9]+\:[0-9]+}}], v[{{[0-9]+}}:{{[0-9]+}}]{{( offset:[0-9]+)*}} glc{{$}}
-; GFX10WGP-NEXT: s_waitcnt vmcnt(0) lgkmcnt(0){{$}}
-; GFX10CU:       s_waitcnt vmcnt(0){{$}}
+; GFX10-NEXT:    s_waitcnt vmcnt(0) lgkmcnt(0){{$}}
 ; GFX8-NOT:      buffer_wbinvl1_vol
 ; GFX10WGP-NEXT: buffer_gl0_inv
 ; GFX10CU-NOT:   buffer_gl0_inv
@@ -3272,8 +3265,7 @@ entry:
 ; GFX10CU-NOT:   s_waitcnt vmcnt(0){{$}}
 ; GFX10CU-NOT:   s_waitcnt_vscnt null, 0x0{{$}}
 ; GCN:           flat_atomic_cmpswap v{{[0-9]+}}, v[{{[0-9]+\:[0-9]+}}], v[{{[0-9]+}}:{{[0-9]+}}]{{( offset:[0-9]+)*}} glc{{$}}
-; GFX10WGP-NEXT: s_waitcnt vmcnt(0) lgkmcnt(0){{$}}
-; GFX10CU:       s_waitcnt vmcnt(0){{$}}
+; GFX10-NEXT:    s_waitcnt vmcnt(0) lgkmcnt(0){{$}}
 ; GFX8-NOT:      buffer_wbinvl1_vol
 ; GFX10WGP:      buffer_gl0_inv
 ; GFX10CU-NOT:   buffer_gl0_inv

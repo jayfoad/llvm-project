@@ -145,6 +145,7 @@ main_body:
 ;CHECK-LABEL: {{^}}buffer_load_x1_offen_merged_or:
 ;CHECK-NEXT: %bb.
 ;CHECK-NEXT: v_lshlrev_b32_e32 v{{[0-9]}}, 6, v0
+;GFX10-NEXT: ; implicit-def: $vcc_hi
 ;CHECK-NEXT: buffer_load_dwordx4 v[{{[0-9]}}:{{[0-9]}}], v{{[0-9]}}, s[0:3], 0 offen offset:4
 ;CHECK-NEXT: buffer_load_dwordx2 v[{{[0-9]}}:{{[0-9]}}], v{{[0-9]}}, s[0:3], 0 offen offset:28
 ;CHECK: s_waitcnt
@@ -214,6 +215,7 @@ main_body:
 ;CHECK-LABEL: {{^}}buffer_load_x2_offen_merged_or:
 ;CHECK-NEXT: %bb.
 ;CHECK-NEXT: v_lshlrev_b32_e32 v{{[0-9]}}, 4, v0
+;GFX10-NEXT: ; implicit-def: $vcc_hi
 ;CHECK-NEXT: buffer_load_dwordx4 v[{{[0-9]}}:{{[0-9]}}], v{{[0-9]}}, s[0:3], 0 offen offset:4
 ;CHECK: s_waitcnt
 define amdgpu_ps void @buffer_load_x2_offen_merged_or(<4 x i32> inreg %rsrc, i32 %inp) {

@@ -148,6 +148,8 @@ define void @gws_init_lgkmcnt(i32 %val) {
 
 ; Does not imply memory fence on its own
 ; GCN-LABEL: {{^}}gws_init_wait_before:
+; NOLOOP: s_load_dword
+; NOLOOP: s_load_dword
 ; NOLOOP: s_waitcnt lgkmcnt(0)
 ; NOLOOP-NOT: s_waitcnt
 ; NOLOOP: ds_gws_init

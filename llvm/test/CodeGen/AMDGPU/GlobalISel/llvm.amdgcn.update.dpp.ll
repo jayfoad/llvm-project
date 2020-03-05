@@ -64,15 +64,15 @@ define amdgpu_kernel void @update_dpp64_test(i64 addrspace(1)* %arg, i64 %in1, i
 ; GFX10-NEXT:    s_waitcnt lgkmcnt(0)
 ; GFX10-NEXT:    v_mov_b32_e32 v3, s1
 ; GFX10-NEXT:    v_mov_b32_e32 v2, s0
-; GFX10-NEXT:    v_mov_b32_e32 v5, s3
-; GFX10-NEXT:    v_mov_b32_e32 v4, s2
-; GFX10-NEXT:    v_add_co_u32_e64 v6, vcc_lo, v2, v0
-; GFX10-NEXT:    v_add_co_ci_u32_e32 v7, vcc_lo, v3, v1, vcc_lo
-; GFX10-NEXT:    global_load_dwordx2 v[2:3], v[6:7], off
+; GFX10-NEXT:    v_add_co_u32_e64 v0, vcc_lo, v2, v0
+; GFX10-NEXT:    v_add_co_ci_u32_e32 v1, vcc_lo, v3, v1, vcc_lo
+; GFX10-NEXT:    v_mov_b32_e32 v2, s2
+; GFX10-NEXT:    v_mov_b32_e32 v3, s3
+; GFX10-NEXT:    global_load_dwordx2 v[4:5], v[0:1], off
 ; GFX10-NEXT:    s_waitcnt vmcnt(0)
-; GFX10-NEXT:    v_mov_b32_dpp v4, v2 quad_perm:[1,0,0,0] row_mask:0x1 bank_mask:0x1
-; GFX10-NEXT:    v_mov_b32_dpp v5, v3 quad_perm:[1,0,0,0] row_mask:0x1 bank_mask:0x1
-; GFX10-NEXT:    global_store_dwordx2 v[6:7], v[4:5], off
+; GFX10-NEXT:    v_mov_b32_dpp v2, v4 quad_perm:[1,0,0,0] row_mask:0x1 bank_mask:0x1
+; GFX10-NEXT:    v_mov_b32_dpp v3, v5 quad_perm:[1,0,0,0] row_mask:0x1 bank_mask:0x1
+; GFX10-NEXT:    global_store_dwordx2 v[0:1], v[2:3], off
 ; GFX10-NEXT:    s_endpgm
   %id = tail call i32 @llvm.amdgcn.workitem.id.x()
   %gep = getelementptr inbounds i64, i64 addrspace(1)* %arg, i32 %id

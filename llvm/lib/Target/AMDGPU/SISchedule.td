@@ -93,9 +93,6 @@ def HWVMEM   : ProcResource<1> {
 def HWVALU   : ProcResource<1> {
   let BufferSize = 1;
 }
-def HWRC   : ProcResource<1> { // Register destination cache
-  let BufferSize = 1;
-}
 
 class HWWriteRes<SchedWrite write, list<ProcResourceKind> resources,
                  int latency> : WriteRes<write, resources> {
@@ -186,22 +183,22 @@ let SchedModel = GFX10SpeedModel in {
 
 // The latency values are 1 / (operations / cycle).
 // Add 1 stall cycle for VGPR read.
-def : HWWriteRes<Write32Bit,         [HWVALU, HWRC],   5>;
-def : HWWriteRes<WriteFloatCvt,      [HWVALU, HWRC],   5>;
-def : HWWriteRes<Write64Bit,         [HWVALU, HWRC],   9>;
-def : HWWriteRes<WriteQuarterRate32, [HWVALU, HWRC],   17>;
-def : HWWriteRes<WriteFloatFMA,      [HWVALU, HWRC],   5>;
-def : HWWriteRes<WriteDouble,        [HWVALU, HWRC],   17>;
-def : HWWriteRes<WriteDoubleAdd,     [HWVALU, HWRC],   17>;
-def : HWWriteRes<WriteDoubleCvt,     [HWVALU, HWRC],   17>;
+def : HWWriteRes<Write32Bit,         [HWVALU],   5>;
+def : HWWriteRes<WriteFloatCvt,      [HWVALU],   5>;
+def : HWWriteRes<Write64Bit,         [HWVALU],   9>;
+def : HWWriteRes<WriteQuarterRate32, [HWVALU],   17>;
+def : HWWriteRes<WriteFloatFMA,      [HWVALU],   5>;
+def : HWWriteRes<WriteDouble,        [HWVALU],   17>;
+def : HWWriteRes<WriteDoubleAdd,     [HWVALU],   17>;
+def : HWWriteRes<WriteDoubleCvt,     [HWVALU],   17>;
 
-def : HWWriteRes<WriteBranch,        [HWBranch],       32>;
-def : HWWriteRes<WriteExport,        [HWExport, HWRC], 16>;
-def : HWWriteRes<WriteLDS,           [HWLGKM,   HWRC], 20>;
-def : HWWriteRes<WriteSALU,          [HWSALU,   HWRC], 5>;
-def : HWWriteRes<WriteSMEM,          [HWLGKM,   HWRC], 20>;
-def : HWWriteRes<WriteVMEM,          [HWVMEM,   HWRC], 320>;
-def : HWWriteRes<WriteBarrier,       [HWBranch],       2000>;
+def : HWWriteRes<WriteBranch,        [HWBranch], 32>;
+def : HWWriteRes<WriteExport,        [HWExport], 16>;
+def : HWWriteRes<WriteLDS,           [HWLGKM],   20>;
+def : HWWriteRes<WriteSALU,          [HWSALU],   5>;
+def : HWWriteRes<WriteSMEM,          [HWLGKM],   20>;
+def : HWWriteRes<WriteVMEM,          [HWVMEM],   320>;
+def : HWWriteRes<WriteBarrier,       [HWBranch], 2000>;
 
 def : InstRW<[WriteCopy], (instrs COPY)>;
 

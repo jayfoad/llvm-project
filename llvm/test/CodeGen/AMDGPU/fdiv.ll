@@ -43,8 +43,8 @@ entry:
 
 ; GCN: v_div_scale_f32 [[NUM_SCALE:v[0-9]+]]
 ; GCN-DAG: v_rcp_f32_e32 [[NUM_RCP:v[0-9]+]], [[NUM_SCALE]]
+; GCN-DAG: v_div_scale_f32 [[DEN_SCALE:v[0-9]+]]
 
-; PREGFX10-DAG: v_div_scale_f32 [[DEN_SCALE:v[0-9]+]]
 ; PREGFX10-NOT: s_setreg
 ; PREGFX10: v_fma_f32 [[A:v[0-9]+]], -[[NUM_SCALE]], [[NUM_RCP]], 1.0
 ; PREGFX10: v_fma_f32 [[B:v[0-9]+]], [[A]], [[NUM_RCP]], [[NUM_RCP]]
@@ -57,7 +57,6 @@ entry:
 ; GFX10-NOT: s_denorm_mode
 ; GFX10: v_fma_f32 [[A:v[0-9]+]], -[[NUM_SCALE]], [[NUM_RCP]], 1.0
 ; GFX10: v_fmac_f32_e32 [[B:v[0-9]+]], [[A]], [[NUM_RCP]]
-; GFX10: v_div_scale_f32 [[DEN_SCALE:v[0-9]+]]
 ; GFX10: v_mul_f32_e32 [[C:v[0-9]+]], [[DEN_SCALE]], [[B]]
 ; GFX10: v_fma_f32 [[D:v[0-9]+]], [[C]], -[[NUM_SCALE]], [[DEN_SCALE]]
 ; GFX10: v_fmac_f32_e32 [[E:v[0-9]+]], [[D]], [[B]]
@@ -315,8 +314,8 @@ entry:
 
 ; GCN: v_div_scale_f32 [[NUM_SCALE:v[0-9]+]]
 ; GCN-DAG: v_rcp_f32_e32 [[NUM_RCP:v[0-9]+]], [[NUM_SCALE]]
+; GCN-DAG: v_div_scale_f32 [[DEN_SCALE:v[0-9]+]]
 
-; PREGFX10-DAG: v_div_scale_f32 [[DEN_SCALE:v[0-9]+]]
 ; PREGFX10-NOT: s_setreg
 ; PREGFX10: v_fma_f32 [[A:v[0-9]+]], -[[NUM_SCALE]], [[NUM_RCP]], 1.0
 ; PREGFX10: v_fma_f32 [[B:v[0-9]+]], [[A]], [[NUM_RCP]], [[NUM_RCP]]
@@ -329,7 +328,6 @@ entry:
 ; GFX10-NOT: s_denorm_mode
 ; GFX10: v_fma_f32 [[A:v[0-9]+]], -[[NUM_SCALE]], [[NUM_RCP]], 1.0
 ; GFX10: v_fmac_f32_e32 [[B:v[0-9]+]], [[A]], [[NUM_RCP]]
-; GFX10: v_div_scale_f32 [[DEN_SCALE:v[0-9]+]]
 ; GFX10: v_mul_f32_e32 [[C:v[0-9]+]], [[DEN_SCALE]], [[B]]
 ; GFX10: v_fma_f32 [[D:v[0-9]+]], [[C]], -[[NUM_SCALE]], [[DEN_SCALE]]
 ; GFX10: v_fmac_f32_e32 [[E:v[0-9]+]], [[D]], [[B]]
