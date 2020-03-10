@@ -111,6 +111,9 @@ def HWVMEM   : ProcResource<1> {
 def HWVALU   : ProcResource<1> {
   let BufferSize = 1;
 }
+def HWTrans  : ProcResource<1> {
+  let BufferSize = 1;
+}
 
 // Define the resources and latency of a SchedWrite.
 class HWWriteRes<SchedWrite write, list<ProcResourceKind> resources,
@@ -122,8 +125,17 @@ class HWWriteRes<SchedWrite write, list<ProcResourceKind> resources,
   let NumMicroOps = !if(!empty(resources), 0, 1);
 }
 
+// Define the latency of a VALU SchedWrite.
 class HWVALUWriteRes<SchedWrite write, int latency> :
   HWWriteRes<write, [HWVALU], latency>;
+
+// Define the resources and latency of a SchedWrite, where the resources are all
+// consumed for several cycles. This is used for instructions that take more
+// than one cycle to issue.
+class HWWriteResCycles<SchedWrite write, list<ProcResourceKind> resources,
+                       int cycles, int latency> : HWWriteRes<write, resources, latency> {
+  let ResourceCycles = !foreach(r, resources, cycles);
+}
 
 def PredMIReadVGPR : SchedPredicate<[{TII->hasVGPRUses(*MI)}]>;
 
@@ -214,19 +226,19 @@ let SchedModel = GFX10SpeedModel in {
 
 // The latency values are 1 / (operations / cycle).
 // Add 1 stall cycle for VGPR read.
-def : HWWriteRes<Write32Bit,         [HWVALU],   5>;
-def : HWWriteRes<Write32BitCmp,      [HWVALU],   5>;
-def : HWWriteRes<WriteFloatCvt,      [HWVALU],   5>;
-def : HWWriteRes<Write64Bit,         [HWVALU],   6>;
-def : HWWriteRes<Write64BitCmp,      [HWVALU],   6>;
-def : HWWriteRes<WriteTrans32,       [HWVALU],   10>;
-def : HWWriteRes<WriteQuarterRate32, [HWVALU],   8>;
-def : HWWriteRes<WriteFloatFMA,      [HWVALU],   5>;
-def : HWWriteRes<WriteDouble,        [HWVALU],   22>;
-def : HWWriteRes<WriteDoubleAdd,     [HWVALU],   22>;
-def : HWWriteRes<WriteDoubleCmp,     [HWVALU],   6>;
-def : HWWriteRes<WriteDoubleCvt,     [HWVALU],   22>;
-def : HWWriteRes<WriteTrans64,       [HWVALU],   24>;
+def : HWWriteResCycles<Write32Bit,         [HWVALU],           1,  5>;
+def : HWWriteResCycles<Write32BitCmp,      [HWVALU],           1,  5>;
+def : HWWriteResCycles<WriteFloatCvt,      [HWVALU],           1,  5>;
+def : HWWriteResCycles<Write64Bit,         [HWVALU, HWTrans],  2,  6>;
+def : HWWriteResCycles<Write64BitCmp,      [HWVALU, HWTrans],  2,  6>;
+def : HWWriteResCycles<WriteTrans32,       [HWTrans],          4, 10>;
+def : HWWriteResCycles<WriteQuarterRate32, [HWVALU, HWTrans],  4,  8>;
+def : HWWriteResCycles<WriteFloatFMA,      [HWVALU],           1,  5>;
+def : HWWriteResCycles<WriteDouble,        [HWVALU, HWTrans], 16, 22>;
+def : HWWriteResCycles<WriteDoubleAdd,     [HWVALU, HWTrans], 16, 22>;
+def : HWWriteResCycles<WriteDoubleCmp,     [HWVALU, HWTrans],  2,  6>;
+def : HWWriteResCycles<WriteDoubleCvt,     [HWVALU, HWTrans], 16, 22>;
+def : HWWriteResCycles<WriteTrans64,       [HWVALU, HWTrans], 16, 24>;
 
 def : HWWriteRes<WriteBranch,        [HWBranch], 32>;
 def : HWWriteRes<WriteExport,        [HWExport], 16>;
