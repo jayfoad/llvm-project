@@ -31,10 +31,15 @@ def MIMFMARead  : SchedRead;
 // write operand of an instruction that also writes a VGPR result.
 def WriteVCC    : SchedWrite;
 
-// Vector ALU instructions
+// Normal 16 or 32 bit VALU instructions
 def Write32Bit         : SchedWrite;
+// 16 or 32 bit compare instructions
 def Write32BitCmp      : SchedWrite;
+// Conversion to or from F32 (but not converting F64 to or from F32)
 def WriteFloatCvt      : SchedWrite;
+// F16 or F32 transcendental instructions (these are quarter rate)
+def WriteTrans32       : SchedWrite;
+// Other quarter rate VALU instructions
 def WriteQuarterRate32 : SchedWrite;
 
 def WriteFloatFMA   : SchedWrite;
@@ -50,6 +55,10 @@ def WriteDoubleCmp  : SchedWrite;
 
 // Conversion to or from f64 instruction
 def WriteDoubleCvt  : SchedWrite;
+
+// F64 "transcendental" (actually only reciprocal and/or square root)
+// instructions
+def WriteTrans64    : SchedWrite;
 
 // Half rate 64-bit instructions.
 def Write64Bit    : SchedWrite;
@@ -142,6 +151,7 @@ multiclass SICommonWriteRes {
   def : HWVALUWriteRes<Write64Bit,         2>;
   def : HWVALUWriteRes<Write64BitCmp,      2>;
   def : HWVALUWriteRes<WriteFloatCvt,      4>;
+  def : HWVALUWriteRes<WriteTrans32,       4>;
   def : HWVALUWriteRes<WriteQuarterRate32, 4>;
   def : HWVALUWriteRes<Write2PassMAI,      2>;
   def : HWVALUWriteRes<Write8PassMAI,      8>;
@@ -179,6 +189,7 @@ def : HWVALUWriteRes<WriteDouble,     4>;
 def : HWVALUWriteRes<WriteDoubleAdd,  2>;
 def : HWVALUWriteRes<WriteDoubleCmp,  2>;
 def : HWVALUWriteRes<WriteDoubleCvt,  4>;
+def : HWVALUWriteRes<WriteTrans64,    4>;
 
 def : InstRW<[WriteCopy], (instrs COPY)>;
 
@@ -193,6 +204,7 @@ def : HWVALUWriteRes<WriteDouble,   16>;
 def : HWVALUWriteRes<WriteDoubleAdd, 8>;
 def : HWVALUWriteRes<WriteDoubleCmp, 8>;
 def : HWVALUWriteRes<WriteDoubleCvt, 4>;
+def : HWVALUWriteRes<WriteTrans64,  16>;
 
 def : InstRW<[WriteCopy], (instrs COPY)>;
 
@@ -207,12 +219,14 @@ def : HWWriteRes<Write32BitCmp,      [HWVALU],   5>;
 def : HWWriteRes<WriteFloatCvt,      [HWVALU],   5>;
 def : HWWriteRes<Write64Bit,         [HWVALU],   9>;
 def : HWWriteRes<Write64BitCmp,      [HWVALU],   9>;
+def : HWWriteRes<WriteTrans32,       [HWVALU],   17>;
 def : HWWriteRes<WriteQuarterRate32, [HWVALU],   17>;
 def : HWWriteRes<WriteFloatFMA,      [HWVALU],   5>;
 def : HWWriteRes<WriteDouble,        [HWVALU],   17>;
 def : HWWriteRes<WriteDoubleAdd,     [HWVALU],   17>;
 def : HWWriteRes<WriteDoubleCmp,     [HWVALU],   9>;
 def : HWWriteRes<WriteDoubleCvt,     [HWVALU],   17>;
+def : HWWriteRes<WriteTrans64,       [HWVALU],   17>;
 
 def : HWWriteRes<WriteBranch,        [HWBranch], 32>;
 def : HWWriteRes<WriteExport,        [HWExport], 16>;
