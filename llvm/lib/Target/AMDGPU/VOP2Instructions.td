@@ -173,7 +173,7 @@ multiclass VOP2bInst <string opName,
                       bit GFX9Renamed = 0,
                       bit useSGPRInput = !eq(P.NumSrcArgs, 3)> {
   let renamedInGFX9 = GFX9Renamed in {
-    let SchedRW = [Write32Bit, WriteSALU] in {
+    let SchedRW = [Write32Bit, WriteVCC] in {
       let Uses = !if(useSGPRInput, [VCC, EXEC], [EXEC]), Defs = [VCC] in {
         def _e32 : VOP2_Pseudo <opName, P, VOPPatOrNull<node,P>.ret>,
                    Commutable_REV<revOp#"_e32", !eq(revOp, opName)> {

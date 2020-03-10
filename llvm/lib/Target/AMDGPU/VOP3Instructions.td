@@ -367,13 +367,13 @@ def V_LDEXP_F64 : VOP3Inst <"v_ldexp_f64", VOP3_Profile<VOP_F64_F64_I32>, AMDGPU
 } // End SchedRW = [WriteDoubleAdd], FPDPRounding = 1
 
 def V_DIV_SCALE_F32 : VOP3_Pseudo <"v_div_scale_f32", VOP3b_F32_I1_F32_F32_F32, [], 1> {
-  let SchedRW = [WriteFloatFMA, WriteSALU];
+  let SchedRW = [WriteFloatFMA, WriteVCC];
   let AsmMatchConverter = "";
 }
 
 // Double precision division pre-scale.
 def V_DIV_SCALE_F64 : VOP3_Pseudo <"v_div_scale_f64", VOP3b_F64_I1_F64_F64_F64, [], 1> {
-  let SchedRW = [WriteDouble, WriteSALU];
+  let SchedRW = [WriteDouble, WriteVCC];
   let AsmMatchConverter = "";
   let FPDPRounding = 1;
 }
@@ -434,10 +434,10 @@ def V_MQSAD_U32_U8 : VOP3Inst <"v_mqsad_u32_u8", VOP3_Profile<VOP_V4I32_I64_I32_
 } // End Constraints = "@earlyclobber $vdst", SchedRW = [WriteQuarterRate32]
 
 let isCommutable = 1 in {
-let SchedRW = [WriteQuarterRate32, WriteSALU] in {
+let SchedRW = [WriteQuarterRate32, WriteVCC] in {
 def V_MAD_U64_U32 : VOP3Inst <"v_mad_u64_u32", VOP3b_I64_I1_I32_I32_I64>;
 def V_MAD_I64_I32 : VOP3Inst <"v_mad_i64_i32", VOP3b_I64_I1_I32_I32_I64>;
-} // End SchedRW = [WriteQuarterRate32, WriteSALU]
+} // End SchedRW = [WriteQuarterRate32, WriteVCC]
 } // End isCommutable = 1
 
 } // End SubtargetPredicate = isGFX7Plus

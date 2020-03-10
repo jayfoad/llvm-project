@@ -27,6 +27,10 @@ def WriteBarrier : SchedWrite;
 def MIVGPRRead  : SchedRead;
 def MIMFMARead  : SchedRead;
 
+// Write VCC (an SGPR) from a VALU instruction. This is only used for the second
+// write operand of an instruction that also writes a VGPR result.
+def WriteVCC    : SchedWrite;
+
 // Vector ALU instructions
 def Write32Bit         : SchedWrite;
 def WriteFloatCvt      : SchedWrite;
@@ -94,9 +98,14 @@ def HWVALU   : ProcResource<1> {
   let BufferSize = 1;
 }
 
+// Define the resources and latency of a SchedWrite.
 class HWWriteRes<SchedWrite write, list<ProcResourceKind> resources,
                  int latency> : WriteRes<write, resources> {
   let Latency = latency;
+  // If no resources are specifed then assume that this is for the second or
+  // subsequent operand of an instruction, which we don't want to consume any
+  // additional issue resource.
+  let NumMicroOps = !if(!empty(resources), 0, 1);
 }
 
 class HWVALUWriteRes<SchedWrite write, int latency> :
@@ -118,6 +127,7 @@ multiclass SICommonWriteRes {
   def : HWWriteRes<WriteExport,  [HWExport], 4>;
   def : HWWriteRes<WriteLDS,     [HWLGKM],   5>; // Can be between 2 and 64
   def : HWWriteRes<WriteSALU,    [HWSALU],   1>;
+  def : HWWriteRes<WriteVCC,     [],         1>;
   def : HWWriteRes<WriteSMEM,    [HWLGKM],   5>;
   def : HWWriteRes<WriteVMEM,    [HWVMEM],   80>;
   def : HWWriteRes<WriteBarrier, [HWBranch], 500>; // XXX: Guessed ???
@@ -196,6 +206,7 @@ def : HWWriteRes<WriteBranch,        [HWBranch], 32>;
 def : HWWriteRes<WriteExport,        [HWExport], 16>;
 def : HWWriteRes<WriteLDS,           [HWLGKM],   20>;
 def : HWWriteRes<WriteSALU,          [HWSALU],   5>;
+def : HWWriteRes<WriteVCC,           [],         5>;
 def : HWWriteRes<WriteSMEM,          [HWLGKM],   20>;
 def : HWWriteRes<WriteVMEM,          [HWVMEM],   320>;
 def : HWWriteRes<WriteBarrier,       [HWBranch], 2000>;

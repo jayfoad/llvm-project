@@ -230,8 +230,8 @@ endif:
 ; VI: s_mul_i32
 ; VI: v_mul_hi_u32
 ; VI: v_mul_hi_u32
-; VI: s_mul_i32
 ; VI: v_mad_u64_u32
+; VI: s_mul_i32
 ; VI: s_mul_i32
 ; VI: v_mad_u64_u32
 ; VI: s_mul_i32

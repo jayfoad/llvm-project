@@ -855,36 +855,36 @@ define amdgpu_kernel void @v_test_i16_x_sub_64_zext_to_i32(i32 addrspace(1)* %ou
 ; VI:       ; %bb.0:
 ; VI-NEXT:    s_load_dwordx4 s[0:3], s[0:1], 0x24
 ; VI-NEXT:    v_lshlrev_b32_e32 v1, 1, v0
-; VI-NEXT:    v_lshlrev_b32_e32 v0, 2, v0
+; VI-NEXT:    v_lshlrev_b32_e32 v2, 2, v0
 ; VI-NEXT:    s_waitcnt lgkmcnt(0)
-; VI-NEXT:    v_mov_b32_e32 v2, s3
-; VI-NEXT:    v_add_u32_e32 v1, vcc, s2, v1
-; VI-NEXT:    v_addc_u32_e32 v2, vcc, 0, v2, vcc
-; VI-NEXT:    v_add_u32_e32 v3, vcc, s0, v0
-; VI-NEXT:    flat_load_ushort v0, v[1:2]
-; VI-NEXT:    v_mov_b32_e32 v4, s1
-; VI-NEXT:    v_addc_u32_e32 v4, vcc, 0, v4, vcc
+; VI-NEXT:    v_mov_b32_e32 v3, s3
+; VI-NEXT:    v_add_u32_e32 v0, vcc, s2, v1
+; VI-NEXT:    v_addc_u32_e32 v1, vcc, 0, v3, vcc
+; VI-NEXT:    flat_load_ushort v0, v[0:1]
+; VI-NEXT:    v_mov_b32_e32 v3, s1
+; VI-NEXT:    v_add_u32_e32 v2, vcc, s0, v2
+; VI-NEXT:    v_addc_u32_e32 v3, vcc, 0, v3, vcc
 ; VI-NEXT:    s_waitcnt vmcnt(0) lgkmcnt(0)
 ; VI-NEXT:    v_subrev_u16_e32 v0, 64, v0
-; VI-NEXT:    flat_store_dword v[3:4], v0
+; VI-NEXT:    flat_store_dword v[2:3], v0
 ; VI-NEXT:    s_endpgm
 ;
 ; GFX9-LABEL: v_test_i16_x_sub_64_zext_to_i32:
 ; GFX9:       ; %bb.0:
 ; GFX9-NEXT:    s_load_dwordx4 s[0:3], s[0:1], 0x24
 ; GFX9-NEXT:    v_lshlrev_b32_e32 v1, 1, v0
-; GFX9-NEXT:    v_lshlrev_b32_e32 v0, 2, v0
+; GFX9-NEXT:    v_lshlrev_b32_e32 v2, 2, v0
 ; GFX9-NEXT:    s_waitcnt lgkmcnt(0)
-; GFX9-NEXT:    v_mov_b32_e32 v2, s3
-; GFX9-NEXT:    v_add_co_u32_e32 v1, vcc, s2, v1
-; GFX9-NEXT:    v_addc_co_u32_e32 v2, vcc, 0, v2, vcc
-; GFX9-NEXT:    v_add_co_u32_e32 v3, vcc, s0, v0
-; GFX9-NEXT:    global_load_ushort v0, v[1:2], off
-; GFX9-NEXT:    v_mov_b32_e32 v4, s1
-; GFX9-NEXT:    v_addc_co_u32_e32 v4, vcc, 0, v4, vcc
+; GFX9-NEXT:    v_mov_b32_e32 v3, s3
+; GFX9-NEXT:    v_add_co_u32_e32 v0, vcc, s2, v1
+; GFX9-NEXT:    v_addc_co_u32_e32 v1, vcc, 0, v3, vcc
+; GFX9-NEXT:    global_load_ushort v0, v[0:1], off
+; GFX9-NEXT:    v_mov_b32_e32 v3, s1
+; GFX9-NEXT:    v_add_co_u32_e32 v2, vcc, s0, v2
+; GFX9-NEXT:    v_addc_co_u32_e32 v3, vcc, 0, v3, vcc
 ; GFX9-NEXT:    s_waitcnt vmcnt(0)
 ; GFX9-NEXT:    v_subrev_u16_e32 v0, 64, v0
-; GFX9-NEXT:    global_store_dword v[3:4], v0, off
+; GFX9-NEXT:    global_store_dword v[2:3], v0, off
 ; GFX9-NEXT:    s_endpgm
 ;
 ; GFX10-LABEL: v_test_i16_x_sub_64_zext_to_i32:
