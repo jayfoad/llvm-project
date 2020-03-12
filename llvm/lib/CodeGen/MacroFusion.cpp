@@ -171,7 +171,7 @@ bool MacroFusion::scheduleAdjacentImpl(ScheduleDAGInstrs &DAG, SUnit &AnchorSU) 
   const TargetSubtargetInfo &ST = DAG.MF.getSubtarget();
 
   // Check if the anchor instr may be fused.
-  if (!shouldScheduleAdjacent(TII, ST, nullptr, AnchorMI))
+  if (!shouldScheduleAdjacent(TII, ST, nullptr, AnchorMI, 0))
     return false;
 
   // Explorer for fusion candidates among the dependencies of the anchor instr.
@@ -187,7 +187,7 @@ bool MacroFusion::scheduleAdjacentImpl(ScheduleDAGInstrs &DAG, SUnit &AnchorSU) 
     // Only chain two instructions together at most.
     const MachineInstr *DepMI = DepSU.getInstr();
     if (!hasLessThanNumFused(DepSU, 2) ||
-        !shouldScheduleAdjacent(TII, ST, DepMI, AnchorMI))
+        !shouldScheduleAdjacent(TII, ST, DepMI, AnchorMI, Dep.getLatency()))
       continue;
 
     if (fuseInstructionPair(DAG, DepSU, AnchorSU))

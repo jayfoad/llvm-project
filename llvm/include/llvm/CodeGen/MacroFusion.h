@@ -24,13 +24,14 @@ class ScheduleDAGMutation;
 class TargetInstrInfo;
 class TargetSubtargetInfo;
 
-/// Check if the instr pair, FirstMI and SecondMI, should be fused
-/// together. Given SecondMI, when FirstMI is unspecified, then check if
-/// SecondMI may be part of a fused pair at all.
+/// If FirstMI is nullptr then check whether SecondMI may be part of a fused
+/// pair. Otherwise check whether FirstMI and SecondMI should be fused; in this
+/// case Latency specifies the latency of the scheduling DAG edge between them.
 using ShouldSchedulePredTy = std::function<bool(const TargetInstrInfo &TII,
                                                 const TargetSubtargetInfo &TSI,
                                                 const MachineInstr *FirstMI,
-                                                const MachineInstr &SecondMI)>;
+                                                const MachineInstr &SecondMI,
+                                                int Latency)>;
 
 /// Create a DAG scheduling mutation to pair instructions back to back
 /// for instructions that benefit according to the target-specific

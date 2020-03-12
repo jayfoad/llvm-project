@@ -28,7 +28,8 @@ namespace {
 static bool shouldScheduleAdjacent(const TargetInstrInfo &TII_,
                                    const TargetSubtargetInfo &TSI,
                                    const MachineInstr *FirstMI,
-                                   const MachineInstr &SecondMI) {
+                                   const MachineInstr &SecondMI,
+                                   int Latency) {
   const SIInstrInfo &TII = static_cast<const SIInstrInfo&>(TII_);
 
   switch (SecondMI.getOpcode()) {
@@ -47,10 +48,22 @@ static bool shouldScheduleAdjacent(const TargetInstrInfo &TII_,
     const TargetRegisterInfo *TRI = MRI.getTargetRegisterInfo();
     const MachineOperand *Src2 = TII.getNamedOperand(SecondMI,
                                                      AMDGPU::OpName::src2);
-    return FirstMI->definesRegister(Src2->getReg(), TRI);
+    if (!FirstMI->definesRegister(Src2->getReg(), TRI))
+      return false;
+
+    // If fusing the instructions won't cause a stall, go ahead.
+    if (Latency <= 1)
+      return true;
+
+    // The hardware can issue these instructions back-to-back with no stall if
+    // the first one is v_cmp or v_add/sub with carry-out, and the second one is
+    // v_cndmask or v_add/sub with carry-in.
+    //
+    // This crude check accepts any VALU instruction (v_cmp/add/sub are the only
+    // ones that commonly occur) but rejects other reasonably common inputs like
+    // s_and/or/xor.
+    return TII.isVALU(*FirstMI);
   }
-  default:
-    return false;
   }
 
   return false;
