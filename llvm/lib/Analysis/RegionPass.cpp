@@ -115,12 +115,10 @@ bool RGPassManager::runOnFunction(Function &F) {
           TimeRegion PassTimer(getPassTimer(P));
           CurrentRegion->verifyRegion();
         }
-
-        // Then call the regular verifyAnalysis functions.
-        verifyPreservedAnalysis(P);
       }
 
       removeNotPreservedAnalysis(P);
+      verifyAvailableAnalyses();
       recordAvailableAnalysis(P);
       removeDeadPasses(P,
                        (!isPassDebuggingExecutionsOrMore() || skipThisRegion) ?
