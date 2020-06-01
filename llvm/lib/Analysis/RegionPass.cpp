@@ -90,15 +90,17 @@ bool RGPassManager::runOnFunction(Function &F) {
 
       initializeAnalysisImpl(P);
 
+      bool LocalChanged;
       {
         PassManagerPrettyStackEntry X(P, *CurrentRegion->getEntry());
 
         TimeRegion PassTimer(getPassTimer(P));
-        Changed |= P->runOnRegion(CurrentRegion, *this);
+        LocalChanged = P->runOnRegion(CurrentRegion, *this);
+        Changed |= LocalChanged;
       }
 
       if (isPassDebuggingExecutionsOrMore()) {
-        if (Changed)
+        if (LocalChanged)
           dumpPassInfo(P, MODIFICATION_MSG, ON_REGION_MSG,
                        skipThisRegion ? "<deleted>" :
                                       CurrentRegion->getNameStr());
@@ -117,7 +119,8 @@ bool RGPassManager::runOnFunction(Function &F) {
         }
       }
 
-      removeNotPreservedAnalysis(P);
+      if (LocalChanged)
+        removeNotPreservedAnalysis(P);
       verifyAvailableAnalyses();
       recordAvailableAnalysis(P);
       removeDeadPasses(P,

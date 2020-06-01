@@ -1497,7 +1497,8 @@ bool FPPassManager::runOnFunction(Function &F) {
     dumpPreservedSet(FP);
     dumpUsedSet(FP);
 
-    removeNotPreservedAnalysis(FP);
+    if (LocalChanged)
+      removeNotPreservedAnalysis(FP);
     verifyAvailableAnalyses();
     recordAvailableAnalysis(FP);
     removeDeadPasses(FP, F.getName(), ON_FUNCTION_MSG);
@@ -1596,7 +1597,8 @@ MPPassManager::runOnModule(Module &M) {
     dumpPreservedSet(MP);
     dumpUsedSet(MP);
 
-    removeNotPreservedAnalysis(MP);
+    if (LocalChanged)
+      removeNotPreservedAnalysis(MP);
     verifyAvailableAnalyses();
     recordAvailableAnalysis(MP);
     removeDeadPasses(MP, M.getModuleIdentifier(), ON_MODULE_MSG);
