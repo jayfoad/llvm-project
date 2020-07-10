@@ -181,6 +181,10 @@ namespace llvm {
     /// case of a huge region that gets reduced).
     SUnit *BarrierChain = nullptr;
 
+    /// A list of pending instructions that need to be added as predecessors of
+    /// BarrierChain. These are batched up and added in one go for efficiency.
+    SmallVector<SUnit *, 8> BarrierPreds;
+
   public:
     /// A list of SUnits, used in Value2SUsMap, during DAG construction.
     /// Note: to gain speed it might be worth investigating an optimized
@@ -218,6 +222,13 @@ namespace llvm {
     /// Adds dependencies as needed to SU, from all SUs mapped to V.
     void addChainDependencies(SUnit *SU, Value2SUsMap &Val2SUsMap,
                               ValueType V);
+
+    /// Add SU to the list of pending barrier chain predecessors.
+    void addBarrierPred(SUnit *SU);
+
+    /// Flush the list of pending barrier chain predecessors, adding them as
+    /// predecessors of BarrierChain in the DAG.
+    void flushBarrierPreds();
 
     /// Adds barrier chain edges from all SUs in map, and then clear the map.
     /// This is equivalent to insertBarrierChain(), but optimized for the common

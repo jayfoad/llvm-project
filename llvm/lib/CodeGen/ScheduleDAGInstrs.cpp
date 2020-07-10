@@ -680,6 +680,17 @@ void ScheduleDAGInstrs::addChainDependencies(SUnit *SU,
                          Val2SUsMap.getTrueMemOrderLatency());
 }
 
+void ScheduleDAGInstrs::addBarrierPred(SUnit *SU) {
+  if (BarrierChain)
+    BarrierPreds.push_back(SU);
+}
+
+void ScheduleDAGInstrs::flushBarrierPreds() {
+  for (auto *SU : BarrierPreds)
+    BarrierChain->addPredBarrier(SU);
+  BarrierPreds.clear();
+}
+
 void ScheduleDAGInstrs::addBarrierChain(Value2SUsMap &map) {
   assert(BarrierChain != nullptr);
 
@@ -889,8 +900,8 @@ void ScheduleDAGInstrs::buildSchedGraph(AAResults *AA,
     if (isGlobalMemoryObject(AA, &MI)) {
 
       // Become the barrier chain.
-      if (BarrierChain)
-        BarrierChain->addPredBarrier(SU);
+      addBarrierPred(SU);
+      flushBarrierPreds();
       BarrierChain = SU;
 
       LLVM_DEBUG(dbgs() << "Global memory object and new barrier chain: SU("
@@ -909,8 +920,7 @@ void ScheduleDAGInstrs::buildSchedGraph(AAResults *AA,
     // Instructions that may raise FP exceptions may not be moved
     // across any global barriers.
     if (MI.mayRaiseFPException()) {
-      if (BarrierChain)
-        BarrierChain->addPredBarrier(SU);
+      addBarrierPred(SU);
 
       FPExceptions.insert(SU, UnknownValue);
 
@@ -927,8 +937,7 @@ void ScheduleDAGInstrs::buildSchedGraph(AAResults *AA,
       continue;
 
     // Always add dependecy edge to BarrierChain if present.
-    if (BarrierChain)
-      BarrierChain->addPredBarrier(SU);
+    addBarrierPred(SU);
 
     // Find the underlying objects for MI. The Objs vector is either
     // empty, or filled with the Values of memory locations which this
@@ -1007,6 +1016,7 @@ void ScheduleDAGInstrs::buildSchedGraph(AAResults *AA,
       reduceHugeMemNodeMaps(NonAliasStores, NonAliasLoads, getReductionSize());
     }
   }
+  flushBarrierPreds();
 
   if (DbgMI)
     FirstDbgValue = DbgMI;
@@ -1070,7 +1080,8 @@ void ScheduleDAGInstrs::reduceHugeMemNodeMaps(Value2SUsMap &stores,
     // newBarrierChain is above the former one. If it is not, it may
     // introduce a loop to use newBarrierChain, so keep the old one.
     if (newBarrierChain->NodeNum < BarrierChain->NodeNum) {
-      BarrierChain->addPredBarrier(newBarrierChain);
+      addBarrierPred(newBarrierChain);
+      flushBarrierPreds();
       BarrierChain = newBarrierChain;
       LLVM_DEBUG(dbgs() << "Inserting new barrier chain: SU("
                         << BarrierChain->NodeNum << ").\n";);

@@ -16,6 +16,7 @@
 #define LLVM_CODEGEN_SCHEDULEDAG_H
 
 #include "llvm/ADT/BitVector.h"
+#include "llvm/ADT/DenseMapInfo.h"
 #include "llvm/ADT/GraphTraits.h"
 #include "llvm/ADT/PointerIntPair.h"
 #include "llvm/ADT/SmallVector.h"
@@ -47,6 +48,8 @@ class TargetRegisterInfo;
   /// Scheduling dependency. This represents one direction of an edge in the
   /// scheduling DAG.
   class SDep {
+    friend struct DenseMapInfo<SDep>;
+
   public:
     /// These are the different kinds of scheduling dependencies.
     enum Kind {
@@ -77,18 +80,14 @@ class TargetRegisterInfo;
   private:
     /// A pointer to the depending/depended-on SUnit, and an enum
     /// indicating the kind of the dependency.
-    PointerIntPair<SUnit *, 2, Kind> Dep;
+    using DepType = PointerIntPair<SUnit *, 2, Kind>;
+    DepType Dep;
 
-    /// A union discriminated by the dependence kind.
-    union {
-      /// For Data, Anti, and Output dependencies, the associated register. For
-      /// Data dependencies that don't currently have a register/ assigned, this
-      /// is set to zero.
-      unsigned Reg;
-
-      /// Additional information about Order dependencies.
-      unsigned OrdKind; // enum OrderKind
-    } Contents;
+    /// For Data, Anti, and Output dependencies, the associated register. For
+    /// Data dependencies that don't currently have a register/ assigned, this
+    /// is set to zero.
+    /// For Order dependencies, the OrderKind.
+    unsigned Contents;
 
     /// The time associated with this edge. Often this is just the value of the
     /// Latency field of the predecessor, however advanced models may provide
@@ -102,7 +101,7 @@ class TargetRegisterInfo;
 
     /// Constructs an SDep with the specified values.
     SDep(SUnit *S, Kind kind, unsigned Reg)
-      : Dep(S, kind), Contents() {
+      : Dep(S, kind), Contents(Reg) {
       switch (kind) {
       default:
         llvm_unreachable("Reg given for non-register dependence!");
@@ -110,19 +109,16 @@ class TargetRegisterInfo;
       case Output:
         assert(Reg != 0 &&
                "SDep::Anti and SDep::Output must use a non-zero Reg!");
-        Contents.Reg = Reg;
         Latency = 0;
         break;
       case Data:
-        Contents.Reg = Reg;
         Latency = 1;
         break;
       }
     }
 
     SDep(SUnit *S, OrderKind kind)
-      : Dep(S, Order), Contents(), Latency(0) {
-      Contents.OrdKind = kind;
+      : Dep(S, Order), Contents(kind), Latency(0) {
     }
 
     /// Returns true if the specified SDep is equivalent except for latency.
@@ -166,13 +162,13 @@ class TargetRegisterInfo;
     /// where both sides of the dependence access memory in non-volatile and
     /// fully modeled ways.
     bool isNormalMemory() const {
-      return getKind() == Order && (Contents.OrdKind == MayAliasMem
-                                    || Contents.OrdKind == MustAliasMem);
+      return getKind() == Order && (getOrderKind() == MayAliasMem
+                                    || getOrderKind() == MustAliasMem);
     }
 
     /// Tests if this is an Order dependence that is marked as a barrier.
     bool isBarrier() const {
-      return getKind() == Order && Contents.OrdKind == Barrier;
+      return getKind() == Order && getOrderKind() == Barrier;
     }
 
     /// Tests if this is could be any kind of memory dependence.
@@ -184,7 +180,7 @@ class TargetRegisterInfo;
     /// "must alias", meaning that the SUnits at either end of the edge have a
     /// memory dependence on a known memory location.
     bool isMustAlias() const {
-      return getKind() == Order && Contents.OrdKind == MustAliasMem;
+      return getKind() == Order && getOrderKind() == MustAliasMem;
     }
 
     /// Tests if this a weak dependence. Weak dependencies are considered DAG
@@ -192,24 +188,24 @@ class TargetRegisterInfo;
     /// ordering. Breaking a weak edge may require the scheduler to compensate,
     /// for example by inserting a copy.
     bool isWeak() const {
-      return getKind() == Order && Contents.OrdKind >= Weak;
+      return getKind() == Order && getOrderKind() >= Weak;
     }
 
     /// Tests if this is an Order dependence that is marked as
     /// "artificial", meaning it isn't necessary for correctness.
     bool isArtificial() const {
-      return getKind() == Order && Contents.OrdKind == Artificial;
+      return getKind() == Order && getOrderKind() == Artificial;
     }
 
     /// Tests if this is an Order dependence that is marked as "cluster",
     /// meaning it is artificial and wants to be adjacent.
     bool isCluster() const {
-      return getKind() == Order && Contents.OrdKind == Cluster;
+      return getKind() == Order && getOrderKind() == Cluster;
     }
 
     /// Tests if this is a Data dependence that is associated with a register.
     bool isAssignedRegDep() const {
-      return getKind() == Data && Contents.Reg != 0;
+      return getKind() == Data && getReg() != 0;
     }
 
     /// Returns the register associated with this edge. This is only valid on
@@ -218,7 +214,14 @@ class TargetRegisterInfo;
     unsigned getReg() const {
       assert((getKind() == Data || getKind() == Anti || getKind() == Output) &&
              "getReg called on non-register dependence edge!");
-      return Contents.Reg;
+      return Contents;
+    }
+
+    /// Returns the order kind of this edge. This is only valid on Order edges.
+    unsigned getOrderKind() const {
+      assert(getKind() == Order &&
+             "getOrderKind called on non-order dependence edge!");
+      return Contents;
     }
 
     /// Assigns the associated register for this edge. This is only valid on
@@ -232,10 +235,34 @@ class TargetRegisterInfo;
              "SDep::Anti edge cannot use the zero register!");
       assert((getKind() != Output || Reg != 0) &&
              "SDep::Output edge cannot use the zero register!");
-      Contents.Reg = Reg;
+      Contents = Reg;
     }
 
     void dump(const TargetRegisterInfo *TRI = nullptr) const;
+  };
+
+  /// Provide DenseMapInfo for SDep, ignoring latency.
+  template <> struct DenseMapInfo<SDep> {
+    using PtrInfo = DenseMapInfo<SUnit *>;
+    using DepInfo = DenseMapInfo<SDep::DepType>;
+    using UnsInfo = DenseMapInfo<unsigned>;
+
+    static inline SDep getEmptyKey() {
+      return SDep(PtrInfo::getEmptyKey(), SDep::Barrier);
+    }
+
+    static inline SDep getTombstoneKey() {
+      return SDep(PtrInfo::getTombstoneKey(), SDep::Barrier);
+    }
+
+    static unsigned getHashValue(const SDep &Val) {
+      return detail::combineHashValue(DepInfo::getHashValue(Val.Dep),
+                                      UnsInfo::getHashValue(Val.Contents));
+    }
+
+    static bool isEqual(const SDep &LHS, const SDep &RHS) {
+      return LHS.overlaps(RHS);
+    }
   };
 
   /// Scheduling unit. This is a node in the scheduling DAG.
@@ -379,15 +406,17 @@ class TargetRegisterInfo;
     /// It also adds the current node as a successor of the specified node.
     bool addPred(const SDep &D, bool Required = true);
 
+    /// Add all specified edges as preds of the current node more efficiently
+    /// than making multiple calls to addPred.
+    void addPreds(const ArrayRef<SDep> Deps);
+
     /// Adds a barrier edge to SU by calling addPred(), with latency 0
     /// generally or latency 1 for a store followed by a load.
-    bool addPredBarrier(SUnit *SU) {
-      SDep Dep(SU, SDep::Barrier);
-      unsigned TrueMemOrderLatency =
-        ((SU->getInstr()->mayStore() && this->getInstr()->mayLoad()) ? 1 : 0);
-      Dep.setLatency(TrueMemOrderLatency);
-      return addPred(Dep);
-    }
+    bool addPredBarrier(SUnit *SU);
+
+    /// Add barrier edges to all SUs more efficiently than making multiple calls
+    /// to addPredBarrier.
+    void addPredBarriers(ArrayRef<SUnit *> SUs);
 
     /// Removes the specified edge as a pred of the current node if it exists.
     /// It also removes the current node as a successor of the specified node.
@@ -459,21 +488,16 @@ class TargetRegisterInfo;
   private:
     void ComputeDepth();
     void ComputeHeight();
+
+    /// Adds the specified edge as a pred of the current node without checking
+    /// for duplicates. It also adds the current node as a successor of the
+    /// specified node.
+    bool addPredInternal(const SDep &D);
   };
 
   /// Returns true if the specified SDep is equivalent except for latency.
   inline bool SDep::overlaps(const SDep &Other) const {
-    if (Dep != Other.Dep)
-      return false;
-    switch (Dep.getInt()) {
-    case Data:
-    case Anti:
-    case Output:
-      return Contents.Reg == Other.Contents.Reg;
-    case Order:
-      return Contents.OrdKind == Other.Contents.OrdKind;
-    }
-    llvm_unreachable("Invalid dependency kind!");
+    return Dep == Other.Dep && Contents == Other.Contents;
   }
 
   //// Returns the SUnit to which this edge points.

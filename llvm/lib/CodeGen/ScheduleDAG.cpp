@@ -92,7 +92,7 @@ LLVM_DUMP_METHOD void SDep::dump(const TargetRegisterInfo *TRI) const {
     break;
   case Order:
     dbgs() << " Latency=" << getLatency();
-    switch(Contents.OrdKind) {
+    switch (getOrderKind()) {
     case Barrier:      dbgs() << " Barrier"; break;
     case MayAliasMem:
     case MustAliasMem: dbgs() << " Memory"; break;
@@ -130,7 +130,54 @@ bool SUnit::addPred(const SDep &D, bool Required) {
       return false;
     }
   }
-  // Now add a corresponding succ to N.
+
+  return addPredInternal(D);
+}
+
+void SUnit::addPreds(const ArrayRef<SDep> Deps) {
+  DenseSet<SDep> UniqueDeps;
+
+  // Remove duplicates from Deps, remembering the maximum latency.
+  for (auto &Dep : Deps) {
+    auto IterBool = UniqueDeps.insert(Dep);
+    if (!IterBool.second) {
+      auto &UDep = *IterBool.first;
+      UDep.setLatency(std::max(UDep.getLatency(), Dep.getLatency()));
+    }
+  }
+
+  // Don't add any Deps that are already present in Preds. If we find one that
+  // is present but has a higher latency, update the latency of the Pred
+  // in-place.
+  for (auto &PredDep : Preds) {
+    auto I = UniqueDeps.find(PredDep);
+    if (I == UniqueDeps.end())
+      continue;
+    auto &UDep = *I;
+    // Extend the latency if needed. Equivalent to
+    // removePred(PredDep) + addPred(UDep).
+    if (UDep.getLatency() > PredDep.getLatency()) {
+      SUnit *PredSU = PredDep.getSUnit();
+      // Find the corresponding successor.
+      SDep ForwardD = PredDep;
+      ForwardD.setSUnit(this);
+      for (SDep &SuccDep : PredSU->Succs) {
+        if (SuccDep == ForwardD) {
+          SuccDep.setLatency(UDep.getLatency());
+          break;
+        }
+      }
+      PredDep.setLatency(UDep.getLatency());
+    }
+  }
+
+  // Add Deps that were not already present in Preds.
+  for (auto &Dep : UniqueDeps)
+    addPredInternal(Dep);
+}
+
+bool SUnit::addPredInternal(const SDep &D) {
+  // Add a corresponding succ to N.
   SDep P = D;
   P.setSUnit(this);
   SUnit *N = D.getSUnit();
@@ -170,6 +217,26 @@ bool SUnit::addPred(const SDep &D, bool Required) {
     N->setHeightDirty();
   }
   return true;
+}
+
+bool SUnit::addPredBarrier(SUnit *SU) {
+  bool MayLoad = getInstr()->mayLoad();
+  SDep Dep(SU, SDep::Barrier);
+  bool TrueMemOrder = MayLoad && SU->getInstr()->mayStore();
+  Dep.setLatency(TrueMemOrder ? 1 : 0);
+  return addPred(Dep);
+}
+
+void SUnit::addPredBarriers(ArrayRef<SUnit *> SUs) {
+  bool MayLoad = getInstr()->mayLoad();
+  SmallVector<SDep, 8> Deps;
+  Deps.reserve(SUs.size());
+  for (auto *SU : SUs) {
+    Deps.push_back(SDep(SU, SDep::Barrier));
+    bool TrueMemOrder = MayLoad && SU->getInstr()->mayStore();
+    Deps.back().setLatency(TrueMemOrder ? 1 : 0);
+  }
+  addPreds(Deps);
 }
 
 void SUnit::removePred(const SDep &D) {
