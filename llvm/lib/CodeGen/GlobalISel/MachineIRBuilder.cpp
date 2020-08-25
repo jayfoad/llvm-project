@@ -966,14 +966,86 @@ MachineInstrBuilder MachineIRBuilder::buildInstr(unsigned Opc,
                     SrcOps[0].getLLTTy(*getMRI()));
     break;
   case TargetOpcode::G_ADD:
-  case TargetOpcode::G_AND:
-  case TargetOpcode::G_MUL:
-  case TargetOpcode::G_OR:
+    if (auto CstOp1 = getConstantVRegValWithLookThrough(SrcOps[1].getReg(), *getMRI())) {
+      if (CstOp1->Value == 0)
+        return buildCopy(DstOps[0], SrcOps[0]);
+    }
+    if (auto CstOp0 = getConstantVRegValWithLookThrough(SrcOps[0].getReg(), *getMRI())) {
+      if (CstOp0->Value == 0)
+        return buildCopy(DstOps[0], SrcOps[1]);
+    }
+    goto binary;
   case TargetOpcode::G_SUB:
+    if (auto CstOp1 = getConstantVRegValWithLookThrough(SrcOps[1].getReg(), *getMRI())) {
+      if (CstOp1->Value == 0)
+        return buildCopy(DstOps[0], SrcOps[0]);
+    }
+    goto binary;
+  case TargetOpcode::G_MUL:
+    if (auto CstOp1 = getConstantVRegValWithLookThrough(SrcOps[1].getReg(), *getMRI())) {
+      if (CstOp1->Value == 0)
+        return buildConstant(DstOps[0], 0);
+      if (CstOp1->Value == 1)
+        return buildCopy(DstOps[0], SrcOps[0]);
+    }
+    if (auto CstOp0 = getConstantVRegValWithLookThrough(SrcOps[0].getReg(), *getMRI())) {
+      if (CstOp0->Value == 0)
+        return buildConstant(DstOps[0], 0);
+      if (CstOp0->Value == 1)
+        return buildCopy(DstOps[0], SrcOps[1]);
+    }
+    goto binary;
+  case TargetOpcode::G_AND:
+    if (auto CstOp1 = getConstantVRegValWithLookThrough(SrcOps[1].getReg(), *getMRI())) {
+      if (CstOp1->Value == 0)
+        return buildConstant(DstOps[0], 0);
+      if (CstOp1->Value == -1)
+        return buildCopy(DstOps[0], SrcOps[0]);
+    }
+    if (auto CstOp0 = getConstantVRegValWithLookThrough(SrcOps[0].getReg(), *getMRI())) {
+      if (CstOp0->Value == 0)
+        return buildConstant(DstOps[0], 0);
+      if (CstOp0->Value == -1)
+        return buildCopy(DstOps[0], SrcOps[1]);
+    }
+    goto binary;
+  case TargetOpcode::G_OR:
+    if (auto CstOp1 = getConstantVRegValWithLookThrough(SrcOps[1].getReg(), *getMRI())) {
+      if (CstOp1->Value == 0)
+        return buildCopy(DstOps[0], SrcOps[0]);
+      if (CstOp1->Value == -1)
+        return buildConstant(DstOps[0], -1);
+    }
+    if (auto CstOp0 = getConstantVRegValWithLookThrough(SrcOps[0].getReg(), *getMRI())) {
+      if (CstOp0->Value == 0)
+        return buildCopy(DstOps[0], SrcOps[1]);
+      if (CstOp0->Value == -1)
+        return buildConstant(DstOps[0], -1);
+    }
+    goto binary;
   case TargetOpcode::G_XOR:
+    if (auto CstOp1 = getConstantVRegValWithLookThrough(SrcOps[1].getReg(), *getMRI())) {
+      if (CstOp1->Value == 0)
+        return buildCopy(DstOps[0], SrcOps[0]);
+    }
+    if (auto CstOp0 = getConstantVRegValWithLookThrough(SrcOps[0].getReg(), *getMRI())) {
+      if (CstOp0->Value == 0)
+        return buildCopy(DstOps[0], SrcOps[1]);
+    }
+    goto binary;
   case TargetOpcode::G_UDIV:
-  case TargetOpcode::G_SDIV:
+    if (auto CstOp1 = getConstantVRegValWithLookThrough(SrcOps[1].getReg(), *getMRI())) {
+      if (isPowerOf2_64(CstOp1->Value))
+        return buildLShr(DstOps[0], SrcOps[0], buildConstant(SrcOps[1].getLLTTy(*getMRI()), Log2_64(CstOp1->Value)));
+    }
+    goto binary;
   case TargetOpcode::G_UREM:
+    if (auto CstOp1 = getConstantVRegValWithLookThrough(SrcOps[1].getReg(), *getMRI())) {
+      if (isPowerOf2_64(CstOp1->Value))
+        return buildAnd(DstOps[0], SrcOps[0], buildConstant(SrcOps[1].getLLTTy(*getMRI()), CstOp1->Value - 1));
+    }
+    goto binary;
+  case TargetOpcode::G_SDIV:
   case TargetOpcode::G_SREM:
   case TargetOpcode::G_SMIN:
   case TargetOpcode::G_SMAX:
@@ -982,7 +1054,8 @@ MachineInstrBuilder MachineIRBuilder::buildInstr(unsigned Opc,
   case TargetOpcode::G_UADDSAT:
   case TargetOpcode::G_SADDSAT:
   case TargetOpcode::G_USUBSAT:
-  case TargetOpcode::G_SSUBSAT: {
+  case TargetOpcode::G_SSUBSAT:
+    binary: {
     // All these are binary ops.
     assert(DstOps.size() == 1 && "Invalid Dst");
     assert(SrcOps.size() == 2 && "Invalid Srcs");
@@ -992,10 +1065,29 @@ MachineInstrBuilder MachineIRBuilder::buildInstr(unsigned Opc,
     break;
   }
   case TargetOpcode::G_SHL:
-  case TargetOpcode::G_ASHR:
   case TargetOpcode::G_LSHR:
+    if (auto CstOp1 = getConstantVRegValWithLookThrough(SrcOps[1].getReg(), *getMRI())) {
+      if (CstOp1->Value == 0)
+        return buildCopy(DstOps[0], SrcOps[0]);
+    }
+    if (auto CstOp0 = getConstantVRegValWithLookThrough(SrcOps[0].getReg(), *getMRI())) {
+      if (CstOp0->Value == 0)
+        return buildCopy(DstOps[0], SrcOps[0]);
+    }
+    goto shift;
+  case TargetOpcode::G_ASHR:
+    if (auto CstOp1 = getConstantVRegValWithLookThrough(SrcOps[1].getReg(), *getMRI())) {
+      if (CstOp1->Value == 0)
+        return buildCopy(DstOps[0], SrcOps[0]);
+    }
+    if (auto CstOp0 = getConstantVRegValWithLookThrough(SrcOps[0].getReg(), *getMRI())) {
+      if (CstOp0->Value == 0 || CstOp0->Value == -1)
+        return buildCopy(DstOps[0], SrcOps[0]);
+    }
+    goto shift;
   case TargetOpcode::G_USHLSAT:
-  case TargetOpcode::G_SSHLSAT: {
+  case TargetOpcode::G_SSHLSAT:
+    shift: {
     assert(DstOps.size() == 1 && "Invalid Dst");
     assert(SrcOps.size() == 2 && "Invalid Srcs");
     validateShiftOp(DstOps[0].getLLTTy(*getMRI()),
