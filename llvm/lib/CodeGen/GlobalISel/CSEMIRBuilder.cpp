@@ -108,10 +108,10 @@ void CSEMIRBuilder::profileEverything(unsigned Opc, ArrayRef<DstOp> DstOps,
 
 MachineInstrBuilder CSEMIRBuilder::memoizeMI(MachineInstrBuilder MIB,
                                              void *NodeInsertPos) {
-  assert(canPerformCSEForOpc(MIB->getOpcode()) &&
-         "Attempting to CSE illegal op");
-  MachineInstr *MIBInstr = MIB;
-  getCSEInfo()->insertInstr(MIBInstr, NodeInsertPos);
+  if (canPerformCSEForOpc(MIB->getOpcode())) {
+    MachineInstr *MIBInstr = MIB;
+    getCSEInfo()->insertInstr(MIBInstr, NodeInsertPos);
+  }
   return MIB;
 }
 
