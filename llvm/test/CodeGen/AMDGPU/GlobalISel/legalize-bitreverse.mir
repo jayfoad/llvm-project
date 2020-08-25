@@ -97,10 +97,8 @@ body: |
     ; CHECK: [[BITREVERSE1:%[0-9]+]]:_(s32) = G_BITREVERSE [[COPY2]]
     ; CHECK: [[LSHR2:%[0-9]+]]:_(s32) = G_LSHR [[BITREVERSE1]], [[C]](s32)
     ; CHECK: [[C1:%[0-9]+]]:_(s32) = G_CONSTANT i32 65535
-    ; CHECK: [[COPY3:%[0-9]+]]:_(s32) = COPY [[LSHR1]](s32)
-    ; CHECK: [[AND:%[0-9]+]]:_(s32) = G_AND [[COPY3]], [[C1]]
-    ; CHECK: [[COPY4:%[0-9]+]]:_(s32) = COPY [[LSHR2]](s32)
-    ; CHECK: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY4]], [[C1]]
+    ; CHECK: [[AND:%[0-9]+]]:_(s32) = G_AND [[LSHR1]], [[C1]]
+    ; CHECK: [[AND1:%[0-9]+]]:_(s32) = G_AND [[LSHR2]], [[C1]]
     ; CHECK: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[AND1]], [[C]](s32)
     ; CHECK: [[OR:%[0-9]+]]:_(s32) = G_OR [[AND]], [[SHL]]
     ; CHECK: [[BITCAST1:%[0-9]+]]:_(<2 x s16>) = G_BITCAST [[OR]](s32)

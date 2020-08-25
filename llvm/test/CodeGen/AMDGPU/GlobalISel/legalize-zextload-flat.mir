@@ -15,8 +15,7 @@ body: |
     ; VI: [[COPY:%[0-9]+]]:_(p0) = COPY $vgpr0_vgpr1
     ; VI: [[LOAD:%[0-9]+]]:_(s32) = G_LOAD [[COPY]](p0) :: (load 1)
     ; VI: [[C:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; VI: [[COPY1:%[0-9]+]]:_(s32) = COPY [[LOAD]](s32)
-    ; VI: [[AND:%[0-9]+]]:_(s32) = G_AND [[COPY1]], [[C]]
+    ; VI: [[AND:%[0-9]+]]:_(s32) = G_AND [[LOAD]], [[C]]
     ; VI: $vgpr0 = COPY [[AND]](s32)
     %0:_(p0) = COPY $vgpr0_vgpr1
     %1:_(s32) = G_ZEXTLOAD %0 :: (load 1, addrspace 0)
@@ -36,8 +35,7 @@ body: |
     ; VI: [[COPY:%[0-9]+]]:_(p0) = COPY $vgpr0_vgpr1
     ; VI: [[LOAD:%[0-9]+]]:_(s32) = G_LOAD [[COPY]](p0) :: (load 2)
     ; VI: [[C:%[0-9]+]]:_(s32) = G_CONSTANT i32 65535
-    ; VI: [[COPY1:%[0-9]+]]:_(s32) = COPY [[LOAD]](s32)
-    ; VI: [[AND:%[0-9]+]]:_(s32) = G_AND [[COPY1]], [[C]]
+    ; VI: [[AND:%[0-9]+]]:_(s32) = G_AND [[LOAD]], [[C]]
     ; VI: $vgpr0 = COPY [[AND]](s32)
      %0:_(p0) = COPY $vgpr0_vgpr1
     %1:_(s32) = G_ZEXTLOAD %0 :: (load 2, addrspace 0)
@@ -58,10 +56,9 @@ body: |
     ; VI: [[COPY:%[0-9]+]]:_(p0) = COPY $vgpr0_vgpr1
     ; VI: [[LOAD:%[0-9]+]]:_(s32) = G_LOAD [[COPY]](p0) :: (load 1)
     ; VI: [[C:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; VI: [[COPY1:%[0-9]+]]:_(s32) = COPY [[LOAD]](s32)
-    ; VI: [[AND:%[0-9]+]]:_(s32) = G_AND [[COPY1]], [[C]]
-    ; VI: [[COPY2:%[0-9]+]]:_(s32) = COPY [[AND]](s32)
-    ; VI: $vgpr0 = COPY [[COPY2]](s32)
+    ; VI: [[AND:%[0-9]+]]:_(s32) = G_AND [[LOAD]], [[C]]
+    ; VI: [[COPY1:%[0-9]+]]:_(s32) = COPY [[AND]](s32)
+    ; VI: $vgpr0 = COPY [[COPY1]](s32)
     %0:_(p0) = COPY $vgpr0_vgpr1
     %1:_(s31) = G_ZEXTLOAD %0 :: (load 1, addrspace 0)
     %2:_(s32) = G_ANYEXT %1
@@ -82,8 +79,7 @@ body: |
     ; VI: [[COPY:%[0-9]+]]:_(p0) = COPY $vgpr0_vgpr1
     ; VI: [[LOAD:%[0-9]+]]:_(s32) = G_LOAD [[COPY]](p0) :: (load 1)
     ; VI: [[C:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; VI: [[COPY1:%[0-9]+]]:_(s32) = COPY [[LOAD]](s32)
-    ; VI: [[AND:%[0-9]+]]:_(s32) = G_AND [[COPY1]], [[C]]
+    ; VI: [[AND:%[0-9]+]]:_(s32) = G_AND [[LOAD]], [[C]]
     ; VI: [[ZEXT:%[0-9]+]]:_(s64) = G_ZEXT [[AND]](s32)
     ; VI: $vgpr0_vgpr1 = COPY [[ZEXT]](s64)
     %0:_(p0) = COPY $vgpr0_vgpr1
@@ -105,8 +101,7 @@ body: |
     ; VI: [[COPY:%[0-9]+]]:_(p0) = COPY $vgpr0_vgpr1
     ; VI: [[LOAD:%[0-9]+]]:_(s32) = G_LOAD [[COPY]](p0) :: (load 2)
     ; VI: [[C:%[0-9]+]]:_(s32) = G_CONSTANT i32 65535
-    ; VI: [[COPY1:%[0-9]+]]:_(s32) = COPY [[LOAD]](s32)
-    ; VI: [[AND:%[0-9]+]]:_(s32) = G_AND [[COPY1]], [[C]]
+    ; VI: [[AND:%[0-9]+]]:_(s32) = G_AND [[LOAD]], [[C]]
     ; VI: [[ZEXT:%[0-9]+]]:_(s64) = G_ZEXT [[AND]](s32)
     ; VI: $vgpr0_vgpr1 = COPY [[ZEXT]](s64)
     %0:_(p0) = COPY $vgpr0_vgpr1

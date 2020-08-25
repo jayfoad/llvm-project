@@ -164,8 +164,7 @@ body: |
     ; GFX6: [[AND:%[0-9]+]]:_(s16) = G_AND [[TRUNC]], [[C1]]
     ; GFX6: [[C2:%[0-9]+]]:_(s32) = G_CONSTANT i32 8
     ; GFX6: [[C3:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; GFX6: [[COPY1:%[0-9]+]]:_(s32) = COPY [[LOAD1]](s32)
-    ; GFX6: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY1]], [[C3]]
+    ; GFX6: [[AND1:%[0-9]+]]:_(s32) = G_AND [[LOAD1]], [[C3]]
     ; GFX6: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[AND1]], [[C2]](s32)
     ; GFX6: [[TRUNC1:%[0-9]+]]:_(s16) = G_TRUNC [[SHL]](s32)
     ; GFX6: [[OR:%[0-9]+]]:_(s16) = G_OR [[AND]], [[TRUNC1]]
@@ -209,8 +208,7 @@ body: |
     ; GFX6: [[AND:%[0-9]+]]:_(s16) = G_AND [[TRUNC]], [[C1]]
     ; GFX6: [[C2:%[0-9]+]]:_(s32) = G_CONSTANT i32 8
     ; GFX6: [[C3:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; GFX6: [[COPY1:%[0-9]+]]:_(s32) = COPY [[LOAD1]](s32)
-    ; GFX6: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY1]], [[C3]]
+    ; GFX6: [[AND1:%[0-9]+]]:_(s32) = G_AND [[LOAD1]], [[C3]]
     ; GFX6: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[AND1]], [[C2]](s32)
     ; GFX6: [[TRUNC1:%[0-9]+]]:_(s16) = G_TRUNC [[SHL]](s32)
     ; GFX6: [[OR:%[0-9]+]]:_(s16) = G_OR [[AND]], [[TRUNC1]]

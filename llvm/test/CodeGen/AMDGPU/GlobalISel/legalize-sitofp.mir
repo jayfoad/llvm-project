@@ -218,8 +218,7 @@ body: |
 
     ; GFX6-LABEL: name: test_sitofp_s16_to_s16
     ; GFX6: [[COPY:%[0-9]+]]:_(s32) = COPY $vgpr0
-    ; GFX6: [[COPY1:%[0-9]+]]:_(s32) = COPY [[COPY]](s32)
-    ; GFX6: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY1]], 16
+    ; GFX6: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY]], 16
     ; GFX6: [[SITOFP:%[0-9]+]]:_(s16) = G_SITOFP [[SEXT_INREG]](s32)
     ; GFX6: [[ANYEXT:%[0-9]+]]:_(s32) = G_ANYEXT [[SITOFP]](s16)
     ; GFX6: $vgpr0 = COPY [[ANYEXT]](s32)
@@ -244,14 +243,12 @@ body: |
 
     ; GFX6-LABEL: name: test_sitofp_s16_to_s32
     ; GFX6: [[COPY:%[0-9]+]]:_(s32) = COPY $vgpr0
-    ; GFX6: [[COPY1:%[0-9]+]]:_(s32) = COPY [[COPY]](s32)
-    ; GFX6: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY1]], 16
+    ; GFX6: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY]], 16
     ; GFX6: [[SITOFP:%[0-9]+]]:_(s32) = G_SITOFP [[SEXT_INREG]](s32)
     ; GFX6: $vgpr0 = COPY [[SITOFP]](s32)
     ; GFX8-LABEL: name: test_sitofp_s16_to_s32
     ; GFX8: [[COPY:%[0-9]+]]:_(s32) = COPY $vgpr0
-    ; GFX8: [[COPY1:%[0-9]+]]:_(s32) = COPY [[COPY]](s32)
-    ; GFX8: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY1]], 16
+    ; GFX8: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY]], 16
     ; GFX8: [[SITOFP:%[0-9]+]]:_(s32) = G_SITOFP [[SEXT_INREG]](s32)
     ; GFX8: $vgpr0 = COPY [[SITOFP]](s32)
     %0:_(s32) = COPY $vgpr0
@@ -268,14 +265,12 @@ body: |
 
     ; GFX6-LABEL: name: test_sitofp_s16_to_s64
     ; GFX6: [[COPY:%[0-9]+]]:_(s32) = COPY $vgpr0
-    ; GFX6: [[COPY1:%[0-9]+]]:_(s32) = COPY [[COPY]](s32)
-    ; GFX6: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY1]], 16
+    ; GFX6: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY]], 16
     ; GFX6: [[SITOFP:%[0-9]+]]:_(s64) = G_SITOFP [[SEXT_INREG]](s32)
     ; GFX6: $vgpr0_vgpr1 = COPY [[SITOFP]](s64)
     ; GFX8-LABEL: name: test_sitofp_s16_to_s64
     ; GFX8: [[COPY:%[0-9]+]]:_(s32) = COPY $vgpr0
-    ; GFX8: [[COPY1:%[0-9]+]]:_(s32) = COPY [[COPY]](s32)
-    ; GFX8: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY1]], 16
+    ; GFX8: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY]], 16
     ; GFX8: [[SITOFP:%[0-9]+]]:_(s64) = G_SITOFP [[SEXT_INREG]](s32)
     ; GFX8: $vgpr0_vgpr1 = COPY [[SITOFP]](s64)
     %0:_(s32) = COPY $vgpr0
@@ -292,15 +287,13 @@ body: |
 
     ; GFX6-LABEL: name: test_sitofp_s8_to_s16
     ; GFX6: [[COPY:%[0-9]+]]:_(s32) = COPY $vgpr0
-    ; GFX6: [[COPY1:%[0-9]+]]:_(s32) = COPY [[COPY]](s32)
-    ; GFX6: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY1]], 8
+    ; GFX6: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY]], 8
     ; GFX6: [[SITOFP:%[0-9]+]]:_(s16) = G_SITOFP [[SEXT_INREG]](s32)
     ; GFX6: [[ANYEXT:%[0-9]+]]:_(s32) = G_ANYEXT [[SITOFP]](s16)
     ; GFX6: $vgpr0 = COPY [[ANYEXT]](s32)
     ; GFX8-LABEL: name: test_sitofp_s8_to_s16
     ; GFX8: [[COPY:%[0-9]+]]:_(s32) = COPY $vgpr0
-    ; GFX8: [[COPY1:%[0-9]+]]:_(s32) = COPY [[COPY]](s32)
-    ; GFX8: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY1]], 8
+    ; GFX8: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY]], 8
     ; GFX8: [[SITOFP:%[0-9]+]]:_(s16) = G_SITOFP [[SEXT_INREG]](s32)
     ; GFX8: [[ANYEXT:%[0-9]+]]:_(s32) = G_ANYEXT [[SITOFP]](s16)
     ; GFX8: $vgpr0 = COPY [[ANYEXT]](s32)
@@ -319,14 +312,12 @@ body: |
 
     ; GFX6-LABEL: name: test_sitofp_s8_to_s32
     ; GFX6: [[COPY:%[0-9]+]]:_(s32) = COPY $vgpr0
-    ; GFX6: [[COPY1:%[0-9]+]]:_(s32) = COPY [[COPY]](s32)
-    ; GFX6: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY1]], 8
+    ; GFX6: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY]], 8
     ; GFX6: [[SITOFP:%[0-9]+]]:_(s32) = G_SITOFP [[SEXT_INREG]](s32)
     ; GFX6: $vgpr0 = COPY [[SITOFP]](s32)
     ; GFX8-LABEL: name: test_sitofp_s8_to_s32
     ; GFX8: [[COPY:%[0-9]+]]:_(s32) = COPY $vgpr0
-    ; GFX8: [[COPY1:%[0-9]+]]:_(s32) = COPY [[COPY]](s32)
-    ; GFX8: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY1]], 8
+    ; GFX8: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY]], 8
     ; GFX8: [[SITOFP:%[0-9]+]]:_(s32) = G_SITOFP [[SEXT_INREG]](s32)
     ; GFX8: $vgpr0 = COPY [[SITOFP]](s32)
     %0:_(s32) = COPY $vgpr0
@@ -343,14 +334,12 @@ body: |
 
     ; GFX6-LABEL: name: test_sitofp_s8_to_s64
     ; GFX6: [[COPY:%[0-9]+]]:_(s32) = COPY $vgpr0
-    ; GFX6: [[COPY1:%[0-9]+]]:_(s32) = COPY [[COPY]](s32)
-    ; GFX6: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY1]], 8
+    ; GFX6: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY]], 8
     ; GFX6: [[SITOFP:%[0-9]+]]:_(s64) = G_SITOFP [[SEXT_INREG]](s32)
     ; GFX6: $vgpr0_vgpr1 = COPY [[SITOFP]](s64)
     ; GFX8-LABEL: name: test_sitofp_s8_to_s64
     ; GFX8: [[COPY:%[0-9]+]]:_(s32) = COPY $vgpr0
-    ; GFX8: [[COPY1:%[0-9]+]]:_(s32) = COPY [[COPY]](s32)
-    ; GFX8: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY1]], 8
+    ; GFX8: [[SEXT_INREG:%[0-9]+]]:_(s32) = G_SEXT_INREG [[COPY]], 8
     ; GFX8: [[SITOFP:%[0-9]+]]:_(s64) = G_SITOFP [[SEXT_INREG]](s32)
     ; GFX8: $vgpr0_vgpr1 = COPY [[SITOFP]](s64)
     %0:_(s32) = COPY $vgpr0
@@ -448,8 +437,7 @@ body: |
 
     ; GFX6-LABEL: name: test_sitofp_s33_to_s32
     ; GFX6: [[COPY:%[0-9]+]]:_(s64) = COPY $vgpr0_vgpr1
-    ; GFX6: [[COPY1:%[0-9]+]]:_(s64) = COPY [[COPY]](s64)
-    ; GFX6: [[SEXT_INREG:%[0-9]+]]:_(s64) = G_SEXT_INREG [[COPY1]], 33
+    ; GFX6: [[SEXT_INREG:%[0-9]+]]:_(s64) = G_SEXT_INREG [[COPY]], 33
     ; GFX6: [[C:%[0-9]+]]:_(s32) = G_CONSTANT i32 63
     ; GFX6: [[ASHR:%[0-9]+]]:_(s64) = G_ASHR [[SEXT_INREG]], [[C]](s32)
     ; GFX6: [[UV:%[0-9]+]]:_(s32), [[UV1:%[0-9]+]]:_(s32) = G_UNMERGE_VALUES [[SEXT_INREG]](s64)
@@ -490,8 +478,7 @@ body: |
     ; GFX6: $vgpr0 = COPY [[SELECT3]](s32)
     ; GFX8-LABEL: name: test_sitofp_s33_to_s32
     ; GFX8: [[COPY:%[0-9]+]]:_(s64) = COPY $vgpr0_vgpr1
-    ; GFX8: [[COPY1:%[0-9]+]]:_(s64) = COPY [[COPY]](s64)
-    ; GFX8: [[SEXT_INREG:%[0-9]+]]:_(s64) = G_SEXT_INREG [[COPY1]], 33
+    ; GFX8: [[SEXT_INREG:%[0-9]+]]:_(s64) = G_SEXT_INREG [[COPY]], 33
     ; GFX8: [[C:%[0-9]+]]:_(s32) = G_CONSTANT i32 63
     ; GFX8: [[ASHR:%[0-9]+]]:_(s64) = G_ASHR [[SEXT_INREG]], [[C]](s32)
     ; GFX8: [[UV:%[0-9]+]]:_(s32), [[UV1:%[0-9]+]]:_(s32) = G_UNMERGE_VALUES [[SEXT_INREG]](s64)

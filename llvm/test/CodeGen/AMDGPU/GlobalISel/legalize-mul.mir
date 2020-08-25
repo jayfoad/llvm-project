@@ -220,8 +220,7 @@ body: |
     ; GFX6: [[COPY3:%[0-9]+]]:_(s32) = COPY [[COPY1]](s32)
     ; GFX6: [[MUL:%[0-9]+]]:_(s32) = G_MUL [[COPY2]], [[COPY3]]
     ; GFX6: [[C:%[0-9]+]]:_(s32) = G_CONSTANT i32 65535
-    ; GFX6: [[COPY4:%[0-9]+]]:_(s32) = COPY [[MUL]](s32)
-    ; GFX6: [[AND:%[0-9]+]]:_(s32) = G_AND [[COPY4]], [[C]]
+    ; GFX6: [[AND:%[0-9]+]]:_(s32) = G_AND [[MUL]], [[C]]
     ; GFX6: $vgpr0 = COPY [[AND]](s32)
     ; GFX8-LABEL: name: test_mul_s16
     ; GFX8: [[COPY:%[0-9]+]]:_(s32) = COPY $vgpr0
@@ -269,10 +268,8 @@ body: |
     ; GFX6: [[COPY5:%[0-9]+]]:_(s32) = COPY [[LSHR1]](s32)
     ; GFX6: [[MUL1:%[0-9]+]]:_(s32) = G_MUL [[COPY4]], [[COPY5]]
     ; GFX6: [[C1:%[0-9]+]]:_(s32) = G_CONSTANT i32 65535
-    ; GFX6: [[COPY6:%[0-9]+]]:_(s32) = COPY [[MUL]](s32)
-    ; GFX6: [[AND:%[0-9]+]]:_(s32) = G_AND [[COPY6]], [[C1]]
-    ; GFX6: [[COPY7:%[0-9]+]]:_(s32) = COPY [[MUL1]](s32)
-    ; GFX6: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY7]], [[C1]]
+    ; GFX6: [[AND:%[0-9]+]]:_(s32) = G_AND [[MUL]], [[C1]]
+    ; GFX6: [[AND1:%[0-9]+]]:_(s32) = G_AND [[MUL1]], [[C1]]
     ; GFX6: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[AND1]], [[C]](s32)
     ; GFX6: [[OR:%[0-9]+]]:_(s32) = G_OR [[AND]], [[SHL]]
     ; GFX6: [[BITCAST2:%[0-9]+]]:_(<2 x s16>) = G_BITCAST [[OR]](s32)
@@ -438,17 +435,13 @@ body: |
     ; GFX6: [[COPY9:%[0-9]+]]:_(s32) = COPY [[LSHR3]](s32)
     ; GFX6: [[MUL3:%[0-9]+]]:_(s32) = G_MUL [[COPY8]], [[COPY9]]
     ; GFX6: [[C1:%[0-9]+]]:_(s32) = G_CONSTANT i32 65535
-    ; GFX6: [[COPY10:%[0-9]+]]:_(s32) = COPY [[MUL]](s32)
-    ; GFX6: [[AND:%[0-9]+]]:_(s32) = G_AND [[COPY10]], [[C1]]
-    ; GFX6: [[COPY11:%[0-9]+]]:_(s32) = COPY [[MUL1]](s32)
-    ; GFX6: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY11]], [[C1]]
+    ; GFX6: [[AND:%[0-9]+]]:_(s32) = G_AND [[MUL]], [[C1]]
+    ; GFX6: [[AND1:%[0-9]+]]:_(s32) = G_AND [[MUL1]], [[C1]]
     ; GFX6: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[AND1]], [[C]](s32)
     ; GFX6: [[OR:%[0-9]+]]:_(s32) = G_OR [[AND]], [[SHL]]
     ; GFX6: [[BITCAST4:%[0-9]+]]:_(<2 x s16>) = G_BITCAST [[OR]](s32)
-    ; GFX6: [[COPY12:%[0-9]+]]:_(s32) = COPY [[MUL2]](s32)
-    ; GFX6: [[AND2:%[0-9]+]]:_(s32) = G_AND [[COPY12]], [[C1]]
-    ; GFX6: [[COPY13:%[0-9]+]]:_(s32) = COPY [[MUL3]](s32)
-    ; GFX6: [[AND3:%[0-9]+]]:_(s32) = G_AND [[COPY13]], [[C1]]
+    ; GFX6: [[AND2:%[0-9]+]]:_(s32) = G_AND [[MUL2]], [[C1]]
+    ; GFX6: [[AND3:%[0-9]+]]:_(s32) = G_AND [[MUL3]], [[C1]]
     ; GFX6: [[SHL1:%[0-9]+]]:_(s32) = G_SHL [[AND3]], [[C]](s32)
     ; GFX6: [[OR1:%[0-9]+]]:_(s32) = G_OR [[AND2]], [[SHL1]]
     ; GFX6: [[BITCAST5:%[0-9]+]]:_(<2 x s16>) = G_BITCAST [[OR1]](s32)

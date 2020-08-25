@@ -274,10 +274,8 @@ body: |
     ; CHECK: [[AND9:%[0-9]+]]:_(s32) = G_AND [[LSHR9]], [[C20]]
     ; CHECK: [[OR15:%[0-9]+]]:_(s32) = G_OR [[AND9]], [[SELECT7]]
     ; CHECK: [[C21:%[0-9]+]]:_(s32) = G_CONSTANT i32 65535
-    ; CHECK: [[COPY1:%[0-9]+]]:_(s32) = COPY [[OR7]](s32)
-    ; CHECK: [[AND10:%[0-9]+]]:_(s32) = G_AND [[COPY1]], [[C21]]
-    ; CHECK: [[COPY2:%[0-9]+]]:_(s32) = COPY [[OR15]](s32)
-    ; CHECK: [[AND11:%[0-9]+]]:_(s32) = G_AND [[COPY2]], [[C21]]
+    ; CHECK: [[AND10:%[0-9]+]]:_(s32) = G_AND [[OR7]], [[C21]]
+    ; CHECK: [[AND11:%[0-9]+]]:_(s32) = G_AND [[OR15]], [[C21]]
     ; CHECK: [[SHL4:%[0-9]+]]:_(s32) = G_SHL [[AND11]], [[C19]](s32)
     ; CHECK: [[OR16:%[0-9]+]]:_(s32) = G_OR [[AND10]], [[SHL4]]
     ; CHECK: [[BITCAST:%[0-9]+]]:_(<2 x s16>) = G_BITCAST [[OR16]](s32)
@@ -481,10 +479,8 @@ body: |
     ; CHECK: [[AND9:%[0-9]+]]:_(s32) = G_AND [[LSHR9]], [[C20]]
     ; CHECK: [[OR15:%[0-9]+]]:_(s32) = G_OR [[AND9]], [[SELECT7]]
     ; CHECK: [[C21:%[0-9]+]]:_(s32) = G_CONSTANT i32 65535
-    ; CHECK: [[COPY1:%[0-9]+]]:_(s32) = COPY [[OR7]](s32)
-    ; CHECK: [[AND10:%[0-9]+]]:_(s32) = G_AND [[COPY1]], [[C21]]
-    ; CHECK: [[COPY2:%[0-9]+]]:_(s32) = COPY [[OR15]](s32)
-    ; CHECK: [[AND11:%[0-9]+]]:_(s32) = G_AND [[COPY2]], [[C21]]
+    ; CHECK: [[AND10:%[0-9]+]]:_(s32) = G_AND [[OR7]], [[C21]]
+    ; CHECK: [[AND11:%[0-9]+]]:_(s32) = G_AND [[OR15]], [[C21]]
     ; CHECK: [[SHL4:%[0-9]+]]:_(s32) = G_SHL [[AND11]], [[C19]](s32)
     ; CHECK: [[OR16:%[0-9]+]]:_(s32) = G_OR [[AND10]], [[SHL4]]
     ; CHECK: [[BITCAST:%[0-9]+]]:_(<2 x s16>) = G_BITCAST [[OR16]](s32)

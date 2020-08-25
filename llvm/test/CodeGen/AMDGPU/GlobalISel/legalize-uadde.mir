@@ -57,10 +57,8 @@ body: |
     ; CHECK: [[ANYEXT:%[0-9]+]]:_(s32) = G_ANYEXT [[ICMP2]](s1)
     ; CHECK: [[ANYEXT1:%[0-9]+]]:_(s32) = G_ANYEXT [[ICMP3]](s1)
     ; CHECK: [[C1:%[0-9]+]]:_(s32) = G_CONSTANT i32 1
-    ; CHECK: [[COPY3:%[0-9]+]]:_(s32) = COPY [[ANYEXT]](s32)
-    ; CHECK: [[AND:%[0-9]+]]:_(s32) = G_AND [[COPY3]], [[C1]]
-    ; CHECK: [[COPY4:%[0-9]+]]:_(s32) = COPY [[ANYEXT1]](s32)
-    ; CHECK: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY4]], [[C1]]
+    ; CHECK: [[AND:%[0-9]+]]:_(s32) = G_AND [[ANYEXT]], [[C1]]
+    ; CHECK: [[AND1:%[0-9]+]]:_(s32) = G_AND [[ANYEXT1]], [[C1]]
     ; CHECK: [[BUILD_VECTOR1:%[0-9]+]]:_(<2 x s32>) = G_BUILD_VECTOR [[AND]](s32), [[AND1]](s32)
     ; CHECK: $vgpr0_vgpr1 = COPY [[BUILD_VECTOR]](<2 x s32>)
     ; CHECK: $vgpr2_vgpr3 = COPY [[BUILD_VECTOR1]](<2 x s32>)

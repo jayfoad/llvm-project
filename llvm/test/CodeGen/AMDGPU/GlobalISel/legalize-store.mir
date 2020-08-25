@@ -433,8 +433,7 @@ body: |
     ; SI: [[AND:%[0-9]+]]:_(s16) = G_AND [[TRUNC]], [[C]]
     ; SI: [[C1:%[0-9]+]]:_(s32) = G_CONSTANT i32 8
     ; SI: [[C2:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; SI: [[COPY1:%[0-9]+]]:_(s32) = COPY [[UV1]](s32)
-    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY1]], [[C2]]
+    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C2]]
     ; SI: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[AND1]], [[C1]](s32)
     ; SI: [[TRUNC1:%[0-9]+]]:_(s16) = G_TRUNC [[SHL]](s32)
     ; SI: [[OR:%[0-9]+]]:_(s16) = G_OR [[AND]], [[TRUNC1]]
@@ -475,8 +474,7 @@ body: |
     ; SI: [[AND:%[0-9]+]]:_(s16) = G_AND [[TRUNC]], [[C]]
     ; SI: [[C1:%[0-9]+]]:_(s32) = G_CONSTANT i32 8
     ; SI: [[C2:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; SI: [[COPY1:%[0-9]+]]:_(s32) = COPY [[UV1]](s32)
-    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY1]], [[C2]]
+    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C2]]
     ; SI: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[AND1]], [[C1]](s32)
     ; SI: [[TRUNC1:%[0-9]+]]:_(s16) = G_TRUNC [[SHL]](s32)
     ; SI: [[OR:%[0-9]+]]:_(s16) = G_OR [[AND]], [[TRUNC1]]
@@ -520,24 +518,23 @@ body: |
     ; SI: [[C1:%[0-9]+]]:_(s32) = G_CONSTANT i32 8
     ; SI: [[COPY2:%[0-9]+]]:_(s32) = COPY [[C1]](s32)
     ; SI: [[C2:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; SI: [[COPY3:%[0-9]+]]:_(s32) = COPY [[UV1]](s32)
-    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY3]], [[C2]]
+    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C2]]
     ; SI: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[AND1]], [[COPY2]](s32)
     ; SI: [[TRUNC2:%[0-9]+]]:_(s16) = G_TRUNC [[SHL]](s32)
     ; SI: [[OR:%[0-9]+]]:_(s16) = G_OR [[AND]], [[TRUNC2]]
-    ; SI: [[COPY4:%[0-9]+]]:_(s16) = COPY [[OR]](s16)
-    ; SI: [[ZEXT:%[0-9]+]]:_(s32) = G_ZEXT [[COPY4]](s16)
+    ; SI: [[COPY3:%[0-9]+]]:_(s16) = COPY [[OR]](s16)
+    ; SI: [[ZEXT:%[0-9]+]]:_(s32) = G_ZEXT [[COPY3]](s16)
     ; SI: [[LSHR:%[0-9]+]]:_(s32) = G_LSHR [[ZEXT]], [[C1]](s32)
-    ; SI: [[ANYEXT:%[0-9]+]]:_(s32) = G_ANYEXT [[COPY4]](s16)
+    ; SI: [[ANYEXT:%[0-9]+]]:_(s32) = G_ANYEXT [[COPY3]](s16)
     ; SI: G_STORE [[ANYEXT]](s32), [[COPY]](p1) :: (store 1, addrspace 1)
     ; SI: [[C3:%[0-9]+]]:_(s64) = G_CONSTANT i64 1
     ; SI: [[PTR_ADD:%[0-9]+]]:_(p1) = G_PTR_ADD [[COPY]], [[C3]](s64)
-    ; SI: [[COPY5:%[0-9]+]]:_(s32) = COPY [[LSHR]](s32)
-    ; SI: G_STORE [[COPY5]](s32), [[PTR_ADD]](p1) :: (store 1 + 1, addrspace 1)
+    ; SI: [[COPY4:%[0-9]+]]:_(s32) = COPY [[LSHR]](s32)
+    ; SI: G_STORE [[COPY4]](s32), [[PTR_ADD]](p1) :: (store 1 + 1, addrspace 1)
     ; SI: [[C4:%[0-9]+]]:_(s64) = G_CONSTANT i64 2
     ; SI: [[PTR_ADD1:%[0-9]+]]:_(p1) = G_PTR_ADD [[COPY]], [[C4]](s64)
-    ; SI: [[COPY6:%[0-9]+]]:_(s32) = COPY [[UV2]](s32)
-    ; SI: G_STORE [[COPY6]](s32), [[PTR_ADD1]](p1) :: (store 1 + 2, addrspace 1)
+    ; SI: [[COPY5:%[0-9]+]]:_(s32) = COPY [[UV2]](s32)
+    ; SI: G_STORE [[COPY5]](s32), [[PTR_ADD1]](p1) :: (store 1 + 2, addrspace 1)
     ; VI-LABEL: name: test_store_global_v3s8_align1
     ; VI: [[COPY:%[0-9]+]]:_(p1) = COPY $vgpr0_vgpr1
     ; VI: [[COPY1:%[0-9]+]]:_(<3 x s32>) = COPY $vgpr2_vgpr3_vgpr4
@@ -588,18 +585,17 @@ body: |
     ; SI: [[AND:%[0-9]+]]:_(s16) = G_AND [[TRUNC1]], [[C]]
     ; SI: [[C1:%[0-9]+]]:_(s32) = G_CONSTANT i32 8
     ; SI: [[C2:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; SI: [[COPY2:%[0-9]+]]:_(s32) = COPY [[UV1]](s32)
-    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY2]], [[C2]]
+    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C2]]
     ; SI: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[AND1]], [[C1]](s32)
     ; SI: [[TRUNC2:%[0-9]+]]:_(s16) = G_TRUNC [[SHL]](s32)
     ; SI: [[OR:%[0-9]+]]:_(s16) = G_OR [[AND]], [[TRUNC2]]
-    ; SI: [[COPY3:%[0-9]+]]:_(s16) = COPY [[OR]](s16)
-    ; SI: [[ANYEXT:%[0-9]+]]:_(s32) = G_ANYEXT [[COPY3]](s16)
+    ; SI: [[COPY2:%[0-9]+]]:_(s16) = COPY [[OR]](s16)
+    ; SI: [[ANYEXT:%[0-9]+]]:_(s32) = G_ANYEXT [[COPY2]](s16)
     ; SI: G_STORE [[ANYEXT]](s32), [[COPY]](p1) :: (store 2, addrspace 1)
     ; SI: [[C3:%[0-9]+]]:_(s64) = G_CONSTANT i64 2
     ; SI: [[PTR_ADD:%[0-9]+]]:_(p1) = G_PTR_ADD [[COPY]], [[C3]](s64)
-    ; SI: [[COPY4:%[0-9]+]]:_(s32) = COPY [[UV2]](s32)
-    ; SI: G_STORE [[COPY4]](s32), [[PTR_ADD]](p1) :: (store 1 + 2, align 2, addrspace 1)
+    ; SI: [[COPY3:%[0-9]+]]:_(s32) = COPY [[UV2]](s32)
+    ; SI: G_STORE [[COPY3]](s32), [[PTR_ADD]](p1) :: (store 1 + 2, align 2, addrspace 1)
     ; VI-LABEL: name: test_store_global_v3s8_align2
     ; VI: [[COPY:%[0-9]+]]:_(p1) = COPY $vgpr0_vgpr1
     ; VI: [[COPY1:%[0-9]+]]:_(<3 x s32>) = COPY $vgpr2_vgpr3_vgpr4
@@ -645,15 +641,13 @@ body: |
     ; SI: [[C1:%[0-9]+]]:_(s32) = G_CONSTANT i32 8
     ; SI: [[COPY2:%[0-9]+]]:_(s32) = COPY [[C1]](s32)
     ; SI: [[C2:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; SI: [[COPY3:%[0-9]+]]:_(s32) = COPY [[UV1]](s32)
-    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY3]], [[C2]]
+    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C2]]
     ; SI: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[AND1]], [[COPY2]](s32)
     ; SI: [[TRUNC1:%[0-9]+]]:_(s16) = G_TRUNC [[SHL]](s32)
     ; SI: [[OR:%[0-9]+]]:_(s16) = G_OR [[AND]], [[TRUNC1]]
     ; SI: [[TRUNC2:%[0-9]+]]:_(s16) = G_TRUNC [[UV2]](s32)
     ; SI: [[AND2:%[0-9]+]]:_(s16) = G_AND [[TRUNC2]], [[C]]
-    ; SI: [[COPY4:%[0-9]+]]:_(s32) = COPY [[DEF]](s32)
-    ; SI: [[AND3:%[0-9]+]]:_(s32) = G_AND [[COPY4]], [[C2]]
+    ; SI: [[AND3:%[0-9]+]]:_(s32) = G_AND [[DEF]], [[C2]]
     ; SI: [[SHL1:%[0-9]+]]:_(s32) = G_SHL [[AND3]], [[C1]](s32)
     ; SI: [[TRUNC3:%[0-9]+]]:_(s16) = G_TRUNC [[SHL1]](s32)
     ; SI: [[OR1:%[0-9]+]]:_(s16) = G_OR [[AND2]], [[TRUNC3]]
@@ -662,11 +656,11 @@ body: |
     ; SI: [[C3:%[0-9]+]]:_(s32) = G_CONSTANT i32 16
     ; SI: [[SHL2:%[0-9]+]]:_(s32) = G_SHL [[ZEXT1]], [[C3]](s32)
     ; SI: [[OR2:%[0-9]+]]:_(s32) = G_OR [[ZEXT]], [[SHL2]]
-    ; SI: [[COPY5:%[0-9]+]]:_(s32) = COPY [[OR2]](s32)
-    ; SI: [[LSHR:%[0-9]+]]:_(s32) = G_LSHR [[COPY5]], [[C3]](s32)
+    ; SI: [[COPY3:%[0-9]+]]:_(s32) = COPY [[OR2]](s32)
+    ; SI: [[LSHR:%[0-9]+]]:_(s32) = G_LSHR [[COPY3]], [[C3]](s32)
     ; SI: [[C4:%[0-9]+]]:_(s64) = G_CONSTANT i64 2
     ; SI: [[PTR_ADD:%[0-9]+]]:_(p1) = G_PTR_ADD [[COPY]], [[C4]](s64)
-    ; SI: G_STORE [[COPY5]](s32), [[COPY]](p1) :: (store 2, align 4, addrspace 1)
+    ; SI: G_STORE [[COPY3]](s32), [[COPY]](p1) :: (store 2, align 4, addrspace 1)
     ; SI: G_STORE [[LSHR]](s32), [[PTR_ADD]](p1) :: (store 1 + 2, align 2, addrspace 1)
     ; VI-LABEL: name: test_store_global_v3s8_align4
     ; VI: [[COPY:%[0-9]+]]:_(p1) = COPY $vgpr0_vgpr1
@@ -770,15 +764,13 @@ body: |
     ; SI: [[C1:%[0-9]+]]:_(s32) = G_CONSTANT i32 8
     ; SI: [[COPY2:%[0-9]+]]:_(s32) = COPY [[C1]](s32)
     ; SI: [[C2:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; SI: [[COPY3:%[0-9]+]]:_(s32) = COPY [[UV1]](s32)
-    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY3]], [[C2]]
+    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C2]]
     ; SI: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[AND1]], [[COPY2]](s32)
     ; SI: [[TRUNC1:%[0-9]+]]:_(s16) = G_TRUNC [[SHL]](s32)
     ; SI: [[OR:%[0-9]+]]:_(s16) = G_OR [[AND]], [[TRUNC1]]
     ; SI: [[TRUNC2:%[0-9]+]]:_(s16) = G_TRUNC [[UV2]](s32)
     ; SI: [[AND2:%[0-9]+]]:_(s16) = G_AND [[TRUNC2]], [[C]]
-    ; SI: [[COPY4:%[0-9]+]]:_(s32) = COPY [[UV3]](s32)
-    ; SI: [[AND3:%[0-9]+]]:_(s32) = G_AND [[COPY4]], [[C2]]
+    ; SI: [[AND3:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C2]]
     ; SI: [[SHL1:%[0-9]+]]:_(s32) = G_SHL [[AND3]], [[C1]](s32)
     ; SI: [[TRUNC3:%[0-9]+]]:_(s16) = G_TRUNC [[SHL1]](s32)
     ; SI: [[OR1:%[0-9]+]]:_(s16) = G_OR [[AND2]], [[TRUNC3]]
@@ -830,20 +822,16 @@ body: |
     ; SI: [[COPY1:%[0-9]+]]:_(<4 x s32>) = COPY $vgpr2_vgpr3_vgpr4_vgpr5
     ; SI: [[UV:%[0-9]+]]:_(s32), [[UV1:%[0-9]+]]:_(s32), [[UV2:%[0-9]+]]:_(s32), [[UV3:%[0-9]+]]:_(s32) = G_UNMERGE_VALUES [[COPY1]](<4 x s32>)
     ; SI: [[C:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; SI: [[COPY2:%[0-9]+]]:_(s32) = COPY [[UV]](s32)
-    ; SI: [[AND:%[0-9]+]]:_(s32) = G_AND [[COPY2]], [[C]]
-    ; SI: [[COPY3:%[0-9]+]]:_(s32) = COPY [[UV1]](s32)
-    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY3]], [[C]]
+    ; SI: [[AND:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C]]
+    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C]]
     ; SI: [[C1:%[0-9]+]]:_(s32) = G_CONSTANT i32 8
     ; SI: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[AND1]], [[C1]](s32)
     ; SI: [[OR:%[0-9]+]]:_(s32) = G_OR [[AND]], [[SHL]]
-    ; SI: [[COPY4:%[0-9]+]]:_(s32) = COPY [[UV2]](s32)
-    ; SI: [[AND2:%[0-9]+]]:_(s32) = G_AND [[COPY4]], [[C]]
+    ; SI: [[AND2:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C]]
     ; SI: [[C2:%[0-9]+]]:_(s32) = G_CONSTANT i32 16
     ; SI: [[SHL1:%[0-9]+]]:_(s32) = G_SHL [[AND2]], [[C2]](s32)
     ; SI: [[OR1:%[0-9]+]]:_(s32) = G_OR [[OR]], [[SHL1]]
-    ; SI: [[COPY5:%[0-9]+]]:_(s32) = COPY [[UV3]](s32)
-    ; SI: [[AND3:%[0-9]+]]:_(s32) = G_AND [[COPY5]], [[C]]
+    ; SI: [[AND3:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C]]
     ; SI: [[C3:%[0-9]+]]:_(s32) = G_CONSTANT i32 24
     ; SI: [[SHL2:%[0-9]+]]:_(s32) = G_SHL [[AND3]], [[C3]](s32)
     ; SI: [[OR2:%[0-9]+]]:_(s32) = G_OR [[OR1]], [[SHL2]]
@@ -853,20 +841,16 @@ body: |
     ; VI: [[COPY1:%[0-9]+]]:_(<4 x s32>) = COPY $vgpr2_vgpr3_vgpr4_vgpr5
     ; VI: [[UV:%[0-9]+]]:_(s32), [[UV1:%[0-9]+]]:_(s32), [[UV2:%[0-9]+]]:_(s32), [[UV3:%[0-9]+]]:_(s32) = G_UNMERGE_VALUES [[COPY1]](<4 x s32>)
     ; VI: [[C:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; VI: [[COPY2:%[0-9]+]]:_(s32) = COPY [[UV]](s32)
-    ; VI: [[AND:%[0-9]+]]:_(s32) = G_AND [[COPY2]], [[C]]
-    ; VI: [[COPY3:%[0-9]+]]:_(s32) = COPY [[UV1]](s32)
-    ; VI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY3]], [[C]]
+    ; VI: [[AND:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C]]
+    ; VI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C]]
     ; VI: [[C1:%[0-9]+]]:_(s32) = G_CONSTANT i32 8
     ; VI: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[AND1]], [[C1]](s32)
     ; VI: [[OR:%[0-9]+]]:_(s32) = G_OR [[AND]], [[SHL]]
-    ; VI: [[COPY4:%[0-9]+]]:_(s32) = COPY [[UV2]](s32)
-    ; VI: [[AND2:%[0-9]+]]:_(s32) = G_AND [[COPY4]], [[C]]
+    ; VI: [[AND2:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C]]
     ; VI: [[C2:%[0-9]+]]:_(s32) = G_CONSTANT i32 16
     ; VI: [[SHL1:%[0-9]+]]:_(s32) = G_SHL [[AND2]], [[C2]](s32)
     ; VI: [[OR1:%[0-9]+]]:_(s32) = G_OR [[OR]], [[SHL1]]
-    ; VI: [[COPY5:%[0-9]+]]:_(s32) = COPY [[UV3]](s32)
-    ; VI: [[AND3:%[0-9]+]]:_(s32) = G_AND [[COPY5]], [[C]]
+    ; VI: [[AND3:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C]]
     ; VI: [[C3:%[0-9]+]]:_(s32) = G_CONSTANT i32 24
     ; VI: [[SHL2:%[0-9]+]]:_(s32) = G_SHL [[AND3]], [[C3]](s32)
     ; VI: [[OR2:%[0-9]+]]:_(s32) = G_OR [[OR1]], [[SHL2]]
@@ -893,8 +877,7 @@ body: |
     ; SI: [[AND:%[0-9]+]]:_(s16) = G_AND [[TRUNC]], [[C]]
     ; SI: [[C1:%[0-9]+]]:_(s32) = G_CONSTANT i32 8
     ; SI: [[C2:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; SI: [[COPY1:%[0-9]+]]:_(s32) = COPY [[UV1]](s32)
-    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY1]], [[C2]]
+    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C2]]
     ; SI: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[AND1]], [[C1]](s32)
     ; SI: [[TRUNC1:%[0-9]+]]:_(s16) = G_TRUNC [[SHL]](s32)
     ; SI: [[OR:%[0-9]+]]:_(s16) = G_OR [[AND]], [[TRUNC1]]
@@ -989,24 +972,23 @@ body: |
     ; SI: [[C1:%[0-9]+]]:_(s32) = G_CONSTANT i32 8
     ; SI: [[COPY2:%[0-9]+]]:_(s32) = COPY [[C1]](s32)
     ; SI: [[C2:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; SI: [[COPY3:%[0-9]+]]:_(s32) = COPY [[UV1]](s32)
-    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY3]], [[C2]]
+    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C2]]
     ; SI: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[AND1]], [[COPY2]](s32)
     ; SI: [[TRUNC2:%[0-9]+]]:_(s16) = G_TRUNC [[SHL]](s32)
     ; SI: [[OR:%[0-9]+]]:_(s16) = G_OR [[AND]], [[TRUNC2]]
-    ; SI: [[COPY4:%[0-9]+]]:_(s16) = COPY [[OR]](s16)
-    ; SI: [[ZEXT:%[0-9]+]]:_(s32) = G_ZEXT [[COPY4]](s16)
+    ; SI: [[COPY3:%[0-9]+]]:_(s16) = COPY [[OR]](s16)
+    ; SI: [[ZEXT:%[0-9]+]]:_(s32) = G_ZEXT [[COPY3]](s16)
     ; SI: [[LSHR:%[0-9]+]]:_(s32) = G_LSHR [[ZEXT]], [[C1]](s32)
-    ; SI: [[ANYEXT:%[0-9]+]]:_(s32) = G_ANYEXT [[COPY4]](s16)
+    ; SI: [[ANYEXT:%[0-9]+]]:_(s32) = G_ANYEXT [[COPY3]](s16)
     ; SI: G_STORE [[ANYEXT]](s32), [[COPY]](p1) :: (store 1, addrspace 1)
     ; SI: [[C3:%[0-9]+]]:_(s64) = G_CONSTANT i64 1
     ; SI: [[PTR_ADD:%[0-9]+]]:_(p1) = G_PTR_ADD [[COPY]], [[C3]](s64)
-    ; SI: [[COPY5:%[0-9]+]]:_(s32) = COPY [[LSHR]](s32)
-    ; SI: G_STORE [[COPY5]](s32), [[PTR_ADD]](p1) :: (store 1 + 1, addrspace 1)
+    ; SI: [[COPY4:%[0-9]+]]:_(s32) = COPY [[LSHR]](s32)
+    ; SI: G_STORE [[COPY4]](s32), [[PTR_ADD]](p1) :: (store 1 + 1, addrspace 1)
     ; SI: [[C4:%[0-9]+]]:_(s64) = G_CONSTANT i64 2
     ; SI: [[PTR_ADD1:%[0-9]+]]:_(p1) = G_PTR_ADD [[COPY]], [[C4]](s64)
-    ; SI: [[COPY6:%[0-9]+]]:_(s32) = COPY [[UV2]](s32)
-    ; SI: G_STORE [[COPY6]](s32), [[PTR_ADD1]](p1) :: (store 1 + 2, addrspace 1)
+    ; SI: [[COPY5:%[0-9]+]]:_(s32) = COPY [[UV2]](s32)
+    ; SI: G_STORE [[COPY5]](s32), [[PTR_ADD1]](p1) :: (store 1 + 2, addrspace 1)
     ; VI-LABEL: name: test_truncstore_global_v4s8_to_3_align1
     ; VI: [[COPY:%[0-9]+]]:_(p1) = COPY $vgpr0_vgpr1
     ; VI: [[COPY1:%[0-9]+]]:_(<4 x s32>) = COPY $vgpr2_vgpr3_vgpr4_vgpr5
@@ -1057,18 +1039,17 @@ body: |
     ; SI: [[AND:%[0-9]+]]:_(s16) = G_AND [[TRUNC1]], [[C]]
     ; SI: [[C1:%[0-9]+]]:_(s32) = G_CONSTANT i32 8
     ; SI: [[C2:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; SI: [[COPY2:%[0-9]+]]:_(s32) = COPY [[UV1]](s32)
-    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY2]], [[C2]]
+    ; SI: [[AND1:%[0-9]+]]:_(s32) = G_AND [[UV]], [[C2]]
     ; SI: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[AND1]], [[C1]](s32)
     ; SI: [[TRUNC2:%[0-9]+]]:_(s16) = G_TRUNC [[SHL]](s32)
     ; SI: [[OR:%[0-9]+]]:_(s16) = G_OR [[AND]], [[TRUNC2]]
-    ; SI: [[COPY3:%[0-9]+]]:_(s16) = COPY [[OR]](s16)
-    ; SI: [[ANYEXT:%[0-9]+]]:_(s32) = G_ANYEXT [[COPY3]](s16)
+    ; SI: [[COPY2:%[0-9]+]]:_(s16) = COPY [[OR]](s16)
+    ; SI: [[ANYEXT:%[0-9]+]]:_(s32) = G_ANYEXT [[COPY2]](s16)
     ; SI: G_STORE [[ANYEXT]](s32), [[COPY]](p1) :: (store 2, addrspace 1)
     ; SI: [[C3:%[0-9]+]]:_(s64) = G_CONSTANT i64 2
     ; SI: [[PTR_ADD:%[0-9]+]]:_(p1) = G_PTR_ADD [[COPY]], [[C3]](s64)
-    ; SI: [[COPY4:%[0-9]+]]:_(s32) = COPY [[UV2]](s32)
-    ; SI: G_STORE [[COPY4]](s32), [[PTR_ADD]](p1) :: (store 1 + 2, align 2, addrspace 1)
+    ; SI: [[COPY3:%[0-9]+]]:_(s32) = COPY [[UV2]](s32)
+    ; SI: G_STORE [[COPY3]](s32), [[PTR_ADD]](p1) :: (store 1 + 2, align 2, addrspace 1)
     ; VI-LABEL: name: test_truncstore_global_v4s8_to_3_align2
     ; VI: [[COPY:%[0-9]+]]:_(p1) = COPY $vgpr0_vgpr1
     ; VI: [[COPY1:%[0-9]+]]:_(<4 x s32>) = COPY $vgpr2_vgpr3_vgpr4_vgpr5

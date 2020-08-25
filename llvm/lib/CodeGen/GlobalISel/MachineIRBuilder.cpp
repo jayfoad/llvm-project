@@ -1026,11 +1026,19 @@ MachineInstrBuilder MachineIRBuilder::buildInstr(unsigned Opc,
            SrcOps[0].getLLTTy(*getMRI()).getSizeInBits() && "invalid bitcast");
     break;
   }
-  case TargetOpcode::COPY:
-    assert(DstOps.size() == 1 && "Invalid Dst");
-    // If the caller wants to add a subreg source it has to be done separately
-    // so we may not have any SrcOps at this point yet.
+  case TargetOpcode::COPY: {
+    assert(DstOps.size() == 1);
+    const DstOp &Dst = DstOps[0];
+    assert(SrcOps.size() == 1);
+    const SrcOp &Src = SrcOps[0];
+    if (Dst.getDstOpKind() == DstOp::DstType::Ty_LLT &&
+        Dst.getLLTTy(*getMRI()) == Src.getLLTTy(*getMRI())) {
+      Register SrcReg = Src.getReg();
+      assert(SrcReg.isVirtual());
+      return MachineInstrBuilder(getMF(), getMRI()->getVRegDef(SrcReg));
+    }
     break;
+  }
   case TargetOpcode::G_FCMP:
   case TargetOpcode::G_ICMP: {
     assert(DstOps.size() == 1 && "Invalid Dst Operands");
