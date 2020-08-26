@@ -10,22 +10,8 @@ body: |
     liveins: $vgpr0
     ; GFX7-LABEL: name: bswap_s8
     ; GFX7: [[COPY:%[0-9]+]]:_(s32) = COPY $vgpr0
-    ; GFX7: [[C:%[0-9]+]]:_(s32) = G_CONSTANT i32 0
-    ; GFX7: [[C1:%[0-9]+]]:_(s32) = G_CONSTANT i32 255
-    ; GFX7: [[COPY1:%[0-9]+]]:_(s32) = COPY [[C]](s32)
-    ; GFX7: [[AND:%[0-9]+]]:_(s32) = G_AND [[COPY1]], [[C1]]
-    ; GFX7: [[COPY2:%[0-9]+]]:_(s32) = COPY [[COPY]](s32)
-    ; GFX7: [[SHL:%[0-9]+]]:_(s32) = G_SHL [[COPY2]], [[AND]](s32)
-    ; GFX7: [[COPY3:%[0-9]+]]:_(s32) = COPY [[C]](s32)
-    ; GFX7: [[AND1:%[0-9]+]]:_(s32) = G_AND [[COPY3]], [[C1]]
-    ; GFX7: [[COPY4:%[0-9]+]]:_(s32) = COPY [[COPY]](s32)
-    ; GFX7: [[AND2:%[0-9]+]]:_(s32) = G_AND [[COPY4]], [[C1]]
-    ; GFX7: [[LSHR:%[0-9]+]]:_(s32) = G_LSHR [[AND2]], [[AND1]](s32)
-    ; GFX7: [[COPY5:%[0-9]+]]:_(s32) = COPY [[LSHR]](s32)
-    ; GFX7: [[COPY6:%[0-9]+]]:_(s32) = COPY [[SHL]](s32)
-    ; GFX7: [[OR:%[0-9]+]]:_(s32) = G_OR [[COPY5]], [[COPY6]]
-    ; GFX7: [[COPY7:%[0-9]+]]:_(s32) = COPY [[OR]](s32)
-    ; GFX7: $vgpr0 = COPY [[COPY7]](s32)
+    ; GFX7: [[COPY1:%[0-9]+]]:_(s32) = COPY [[COPY]](s32)
+    ; GFX7: $vgpr0 = COPY [[COPY1]](s32)
     ; GFX8-LABEL: name: bswap_s8
     ; GFX8: [[COPY:%[0-9]+]]:_(s32) = COPY $vgpr0
     ; GFX8: [[TRUNC:%[0-9]+]]:_(s16) = G_TRUNC [[COPY]](s32)

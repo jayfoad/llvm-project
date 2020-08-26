@@ -2449,8 +2449,11 @@ LegalizerHelper::bitcastExtractVectorElt(MachineInstr &MI, unsigned TypeIdx,
     auto NewBaseIdx = MIRBuilder.buildMul(IdxTy, Idx, NewEltsPerOldEltK);
 
     for (unsigned I = 0; I < NewEltsPerOldElt; ++I) {
-      auto IdxOffset = MIRBuilder.buildConstant(IdxTy, I);
-      auto TmpIdx = MIRBuilder.buildAdd(IdxTy, NewBaseIdx, IdxOffset);
+      Register TmpIdx = NewBaseIdx.getReg(0);
+      if (I != 0) {
+        auto IdxOffset = MIRBuilder.buildConstant(IdxTy, I);
+        TmpIdx = MIRBuilder.buildAdd(IdxTy, NewBaseIdx, IdxOffset).getReg(0);
+      }
       auto Elt = MIRBuilder.buildExtractVectorElement(NewEltTy, CastVec, TmpIdx);
       NewOps[I] = Elt.getReg(0);
     }
@@ -6034,10 +6037,20 @@ LegalizerHelper::lowerBswap(MachineInstr &MI) {
   Register Dst = MI.getOperand(0).getReg();
   Register Src = MI.getOperand(1).getReg();
   const LLT Ty = MRI.getType(Src);
-  unsigned SizeInBytes = (Ty.getScalarSizeInBits() + 7) / 8;
-  unsigned BaseShiftAmt = (SizeInBytes - 1) * 8;
+  unsigned SizeInBits = Ty.getScalarSizeInBits();
+  if (SizeInBits % 8 != 0)
+    return UnableToLegalize;
+
+  unsigned SizeInBytes = SizeInBits / 8;
+  if (SizeInBytes == 1) {
+    // Degenerate case.
+    MIRBuilder.buildCopy(Dst, Src);
+    MI.eraseFromParent();
+    return Legalized;
+  }
 
   // Swap most and least significant byte, set remaining bytes in Res to zero.
+  unsigned BaseShiftAmt = (SizeInBytes - 1) * 8;
   auto ShiftAmt = MIRBuilder.buildConstant(Ty, BaseShiftAmt);
   auto LSByteShiftedLeft = MIRBuilder.buildShl(Ty, Src, ShiftAmt);
   auto MSByteShiftedRight = MIRBuilder.buildLShr(Ty, Src, ShiftAmt);

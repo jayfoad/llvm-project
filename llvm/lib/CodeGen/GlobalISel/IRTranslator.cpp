@@ -510,16 +510,18 @@ bool IRTranslator::emitJumpTableHeader(SwitchCG::JumpTable &JT,
   // Subtract the lowest switch case value from the value being switched on.
   const LLT SwitchTy = getLLTForType(*SValue.getType(), *DL);
   Register SwitchOpReg = getOrCreateVReg(SValue);
-  auto FirstCst = MIB.buildConstant(SwitchTy, JTH.First);
-  auto Sub = MIB.buildSub({SwitchTy}, SwitchOpReg, FirstCst);
+  if (JTH.First != 0) {
+    auto FirstCst = MIB.buildConstant(SwitchTy, JTH.First);
+    SwitchOpReg = MIB.buildSub({SwitchTy}, SwitchOpReg, FirstCst).getReg(0);
+  }
 
   // This value may be smaller or larger than the target's pointer type, and
   // therefore require extension or truncating.
   Type *PtrIRTy = SValue.getType()->getPointerTo();
   const LLT PtrScalarTy = LLT::scalar(DL->getTypeSizeInBits(PtrIRTy));
-  Sub = MIB.buildZExtOrTrunc(PtrScalarTy, Sub);
+  SwitchOpReg = MIB.buildZExtOrTrunc(PtrScalarTy, SwitchOpReg).getReg(0);
 
-  JT.Reg = Sub.getReg(0);
+  JT.Reg = SwitchOpReg;
 
   if (JTH.OmitRangeCheck) {
     if (JT.MBB != HeaderBB->getNextNode())
@@ -533,7 +535,7 @@ bool IRTranslator::emitJumpTableHeader(SwitchCG::JumpTable &JT,
   auto Cst = getOrCreateVReg(
       *ConstantInt::get(SValue.getType(), JTH.Last - JTH.First));
   Cst = MIB.buildZExtOrTrunc(PtrScalarTy, Cst).getReg(0);
-  auto Cmp = MIB.buildICmp(CmpInst::ICMP_UGT, LLT::scalar(1), Sub, Cst);
+  auto Cmp = MIB.buildICmp(CmpInst::ICMP_UGT, LLT::scalar(1), SwitchOpReg, Cst);
 
   auto BrCond = MIB.buildBrCond(Cmp.getReg(0), *JT.Default);
 
