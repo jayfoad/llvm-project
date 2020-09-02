@@ -185,13 +185,14 @@ define <2 x i64> @var_funnnel_v2i64(<2 x i64> %x, <2 x i64> %y, <2 x i64> %amt) 
 ; X32-SSE-NEXT:    psrlq $1, %xmm1
 ; X32-SSE-NEXT:    movdqa %xmm1, %xmm5
 ; X32-SSE-NEXT:    psrlq %xmm4, %xmm5
-; X32-SSE-NEXT:    pshufd {{.*#+}} xmm4 = xmm4[2,3,2,3]
+; X32-SSE-NEXT:    pxor %xmm6, %xmm6
+; X32-SSE-NEXT:    punpckhdq {{.*#+}} xmm4 = xmm4[2],xmm6[2],xmm4[3],xmm6[3]
 ; X32-SSE-NEXT:    psrlq %xmm4, %xmm1
 ; X32-SSE-NEXT:    movsd {{.*#+}} xmm1 = xmm5[0],xmm1[1]
 ; X32-SSE-NEXT:    pand %xmm3, %xmm2
 ; X32-SSE-NEXT:    movdqa %xmm0, %xmm3
 ; X32-SSE-NEXT:    psllq %xmm2, %xmm3
-; X32-SSE-NEXT:    pshufd {{.*#+}} xmm2 = xmm2[2,3,2,3]
+; X32-SSE-NEXT:    punpckhdq {{.*#+}} xmm2 = xmm2[2],xmm6[2],xmm2[3],xmm6[3]
 ; X32-SSE-NEXT:    psllq %xmm2, %xmm0
 ; X32-SSE-NEXT:    movsd {{.*#+}} xmm0 = xmm3[0],xmm0[1]
 ; X32-SSE-NEXT:    orpd %xmm1, %xmm0
@@ -1240,13 +1241,14 @@ define <2 x i64> @splatvar_funnnel_v2i64(<2 x i64> %x, <2 x i64> %y, <2 x i64> %
 ; X32-SSE-NEXT:    psrlq $1, %xmm1
 ; X32-SSE-NEXT:    movdqa %xmm1, %xmm5
 ; X32-SSE-NEXT:    psrlq %xmm4, %xmm5
-; X32-SSE-NEXT:    pshufd {{.*#+}} xmm4 = xmm4[2,3,2,3]
+; X32-SSE-NEXT:    pxor %xmm6, %xmm6
+; X32-SSE-NEXT:    punpckhdq {{.*#+}} xmm4 = xmm4[2],xmm6[2],xmm4[3],xmm6[3]
 ; X32-SSE-NEXT:    psrlq %xmm4, %xmm1
 ; X32-SSE-NEXT:    movsd {{.*#+}} xmm1 = xmm5[0],xmm1[1]
 ; X32-SSE-NEXT:    pand %xmm3, %xmm2
 ; X32-SSE-NEXT:    movdqa %xmm0, %xmm3
 ; X32-SSE-NEXT:    psllq %xmm2, %xmm3
-; X32-SSE-NEXT:    pshufd {{.*#+}} xmm2 = xmm2[2,3,2,3]
+; X32-SSE-NEXT:    punpckhdq {{.*#+}} xmm2 = xmm2[2],xmm6[2],xmm2[3],xmm6[3]
 ; X32-SSE-NEXT:    psllq %xmm2, %xmm0
 ; X32-SSE-NEXT:    movsd {{.*#+}} xmm0 = xmm3[0],xmm0[1]
 ; X32-SSE-NEXT:    orpd %xmm1, %xmm0
@@ -2505,17 +2507,15 @@ define <2 x i64> @constant_funnnel_v2i64(<2 x i64> %x, <2 x i64> %y) nounwind {
 ; X32-SSE-NEXT:    movdqa {{.*#+}} xmm3 = <4,u,14,u>
 ; X32-SSE-NEXT:    movdqa %xmm3, %xmm4
 ; X32-SSE-NEXT:    pandn %xmm2, %xmm4
-; X32-SSE-NEXT:    psrlq $1, %xmm1
 ; X32-SSE-NEXT:    movdqa %xmm1, %xmm5
+; X32-SSE-NEXT:    psrlq $1, %xmm5
 ; X32-SSE-NEXT:    psrlq %xmm4, %xmm5
-; X32-SSE-NEXT:    pshufd {{.*#+}} xmm4 = xmm4[2,3,2,3]
-; X32-SSE-NEXT:    psrlq %xmm4, %xmm1
+; X32-SSE-NEXT:    psrlq $50, %xmm1
 ; X32-SSE-NEXT:    movsd {{.*#+}} xmm1 = xmm5[0],xmm1[1]
 ; X32-SSE-NEXT:    pand %xmm2, %xmm3
 ; X32-SSE-NEXT:    movdqa %xmm0, %xmm2
 ; X32-SSE-NEXT:    psllq %xmm3, %xmm2
-; X32-SSE-NEXT:    pshufd {{.*#+}} xmm3 = xmm3[2,3,2,3]
-; X32-SSE-NEXT:    psllq %xmm3, %xmm0
+; X32-SSE-NEXT:    psllq $14, %xmm0
 ; X32-SSE-NEXT:    movsd {{.*#+}} xmm0 = xmm2[0],xmm0[1]
 ; X32-SSE-NEXT:    orpd %xmm1, %xmm0
 ; X32-SSE-NEXT:    retl
@@ -3032,10 +3032,8 @@ define <2 x i64> @splatconstant_funnnel_v2i64(<2 x i64> %x, <2 x i64> %y) nounwi
 ; X32-SSE-LABEL: splatconstant_funnnel_v2i64:
 ; X32-SSE:       # %bb.0:
 ; X32-SSE-NEXT:    psrlq $50, %xmm1
-; X32-SSE-NEXT:    movsd {{.*#+}} xmm1 = xmm1[0,1]
 ; X32-SSE-NEXT:    psllq $14, %xmm0
-; X32-SSE-NEXT:    movsd {{.*#+}} xmm0 = xmm0[0,1]
-; X32-SSE-NEXT:    orpd %xmm1, %xmm0
+; X32-SSE-NEXT:    por %xmm1, %xmm0
 ; X32-SSE-NEXT:    retl
   %res = call <2 x i64> @llvm.fshl.v2i64(<2 x i64> %x, <2 x i64> %y, <2 x i64> <i64 14, i64 14>)
   ret <2 x i64> %res

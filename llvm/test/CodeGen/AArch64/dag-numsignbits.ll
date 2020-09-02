@@ -4,13 +4,10 @@
 
 define void @signbits_vXi1(<4 x i16> %a1) {
 ; CHECK-LABEL: signbits_vXi1
-; CHECK: cmgt v0.4h, v1.4h, v0.4h
-; CHECK-NEXT: and v0.8b, v0.8b, v2.8b
-; CHECK-NEXT: shl v0.4h, v0.4h, #15
-; CHECK-NEXT: sshr v0.4h, v0.4h, #15
+; CHECK: mov w1, wzr
+; CHECK: cmgt v0.4h, v2.4h, v0.4h
 ; CHECK-NEXT: umov w0, v0.h[0]
 ; CHECK-NEXT: umov w3, v0.h[3]
-; CHECK-NEXT: mov w1, wzr
 ; CHECK-NEXT: mov w2, wzr
 ; CHECK-NEXT: b foo
   %tmp3 = shufflevector <4 x i16> %a1, <4 x i16> undef, <4 x i32> zeroinitializer

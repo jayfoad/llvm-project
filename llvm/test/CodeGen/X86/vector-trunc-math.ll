@@ -2314,8 +2314,8 @@ define <4 x i32> @trunc_mul_const_v4i64_v4i32(<4 x i64> %a0) nounwind {
 ; SSE-LABEL: trunc_mul_const_v4i64_v4i32:
 ; SSE:       # %bb.0:
 ; SSE-NEXT:    pmuludq {{.*}}(%rip), %xmm1
-; SSE-NEXT:    pmuludq {{.*}}(%rip), %xmm0
 ; SSE-NEXT:    shufps {{.*#+}} xmm0 = xmm0[0,2],xmm1[0,2]
+; SSE-NEXT:    andps {{.*}}(%rip), %xmm0
 ; SSE-NEXT:    retq
 ;
 ; AVX1-LABEL: trunc_mul_const_v4i64_v4i32:
@@ -2710,6 +2710,7 @@ define <16 x i8> @trunc_mul_const_v16i16_v16i8(<16 x i16> %a0) nounwind {
 ; SSE-NEXT:    pand %xmm2, %xmm1
 ; SSE-NEXT:    pand %xmm2, %xmm0
 ; SSE-NEXT:    packuswb %xmm1, %xmm0
+; SSE-NEXT:    pand {{.*}}(%rip), %xmm0
 ; SSE-NEXT:    retq
 ;
 ; AVX1-LABEL: trunc_mul_const_v16i16_v16i8:

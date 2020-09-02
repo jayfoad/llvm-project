@@ -17842,6 +17842,14 @@ SDValue DAGCombiner::visitEXTRACT_VECTOR_ELT(SDNode *N) {
   unsigned NumElts = VecVT.getVectorNumElements();
   unsigned VecEltBitWidth = VecVT.getScalarSizeInBits();
 
+  // If all bits of the extracted element are known, return it as a constant.
+  if (IndexC && ScalarVT.isInteger() && ScalarVT == VecVT.getVectorElementType()) {
+    APInt DemandedElts = APInt::getOneBitSet(NumElts, IndexC->getZExtValue());
+    KnownBits Known = DAG.computeKnownBits(VecOp, DemandedElts);
+    if (Known.isConstant())
+      return DAG.getConstant(Known.getConstant(), DL, ScalarVT);
+  }
+
   // TODO: These transforms should not require the 'hasOneUse' restriction, but
   // there are regressions on multiple targets without it. We can end up with a
   // mess of scalar and vector code if we reduce only part of the DAG to scalar.

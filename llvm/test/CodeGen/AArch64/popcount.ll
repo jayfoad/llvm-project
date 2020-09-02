@@ -74,8 +74,7 @@ define <1 x i128> @popcount1x128(<1 x i128> %0) {
 ; CHECK-NEXT:    mov v1.16b, v0.16b
 ; CHECK-NEXT:    fmov w0, s1
 ; CHECK-NEXT:    // kill: def $x0 killed $w0
-; CHECK-NEXT:    movi v0.2d, #0000000000000000
-; CHECK-NEXT:    mov x1, v0.d[1]
+; CHECK-NEXT:    mov x1, xzr
 ; CHECK-NEXT:    ret
 Entry:
   %1 = tail call <1 x i128> @llvm.ctpop.v1.i128(<1 x i128> %0)
