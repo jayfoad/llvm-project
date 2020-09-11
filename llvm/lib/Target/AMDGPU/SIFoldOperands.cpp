@@ -1137,41 +1137,6 @@ static bool tryConstantFoldOp(MachineRegisterInfo &MRI,
   return false;
 }
 
-// Try to fold an instruction into a simpler one
-static bool tryFoldInst(const SIInstrInfo *TII,
-                        MachineInstr *MI) {
-  unsigned Opc = MI->getOpcode();
-
-  if (Opc == AMDGPU::V_CNDMASK_B32_e32    ||
-      Opc == AMDGPU::V_CNDMASK_B32_e64    ||
-      Opc == AMDGPU::V_CNDMASK_B64_PSEUDO) {
-    const MachineOperand *Src0 = TII->getNamedOperand(*MI, AMDGPU::OpName::src0);
-    const MachineOperand *Src1 = TII->getNamedOperand(*MI, AMDGPU::OpName::src1);
-    int Src1ModIdx = AMDGPU::getNamedOperandIdx(Opc, AMDGPU::OpName::src1_modifiers);
-    int Src0ModIdx = AMDGPU::getNamedOperandIdx(Opc, AMDGPU::OpName::src0_modifiers);
-    if (Src1->isIdenticalTo(*Src0) &&
-        (Src1ModIdx == -1 || !MI->getOperand(Src1ModIdx).getImm()) &&
-        (Src0ModIdx == -1 || !MI->getOperand(Src0ModIdx).getImm())) {
-      LLVM_DEBUG(dbgs() << "Folded " << *MI << " into ");
-      auto &NewDesc =
-          TII->get(Src0->isReg() ? (unsigned)AMDGPU::COPY : getMovOpc(false));
-      int Src2Idx = AMDGPU::getNamedOperandIdx(Opc, AMDGPU::OpName::src2);
-      if (Src2Idx != -1)
-        MI->RemoveOperand(Src2Idx);
-      MI->RemoveOperand(AMDGPU::getNamedOperandIdx(Opc, AMDGPU::OpName::src1));
-      if (Src1ModIdx != -1)
-        MI->RemoveOperand(Src1ModIdx);
-      if (Src0ModIdx != -1)
-        MI->RemoveOperand(Src0ModIdx);
-      mutateCopyOp(*MI, NewDesc);
-      LLVM_DEBUG(dbgs() << *MI << '\n');
-      return true;
-    }
-  }
-
-  return false;
-}
-
 void SIFoldOperands::foldInstOperand(MachineInstr &MI,
                                      MachineOperand &OpToFold) const {
   // We need mutate the operands of new mov instructions to add implicit
@@ -1290,7 +1255,6 @@ void SIFoldOperands::foldInstOperand(MachineInstr &MI,
       LLVM_DEBUG(dbgs() << "Folded source from " << MI << " into OpNo "
                         << static_cast<int>(Fold.UseOpNo) << " of "
                         << *Fold.UseMI << '\n');
-      tryFoldInst(TII, Fold.UseMI);
     } else if (Fold.isCommuted()) {
       // Restoring instruction's original operand order if fold has failed.
       TII->commuteInstruction(*Fold.UseMI, false);
@@ -1526,8 +1490,6 @@ bool SIFoldOperands::runOnMachineFunction(MachineFunction &MF) {
     for (I = MBB->begin(); I != MBB->end(); I = Next) {
       Next = std::next(I);
       MachineInstr &MI = *I;
-
-      tryFoldInst(TII, &MI);
 
       if (!TII->isFoldableCopy(MI)) {
         // Saw an unknown clobber of m0, so we no longer know what it is.
