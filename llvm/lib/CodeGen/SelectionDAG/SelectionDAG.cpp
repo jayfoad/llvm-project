@@ -3425,6 +3425,13 @@ KnownBits SelectionDAG::computeKnownBits(SDValue Op, const APInt &DemandedElts,
       Known = KnownBits::smin(Known, Known2);
     break;
   }
+  case ISD::FCOPYSIGN:
+    // Only handle the common case of copying an unknown sign bit into a known
+    // constant.
+    Known = computeKnownBits(Op.getOperand(0), DemandedElts, Depth + 1);
+    Known.Zero.clearSignBit();
+    Known.One.clearSignBit();
+    break;
   case ISD::FrameIndex:
   case ISD::TargetFrameIndex:
     TLI->computeKnownBitsForFrameIndex(cast<FrameIndexSDNode>(Op)->getIndex(),
