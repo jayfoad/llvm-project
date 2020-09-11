@@ -105,8 +105,8 @@ define void @shuf5(<8 x i8>* %p) nounwind {
 ; X86-LABEL: shuf5:
 ; X86:       # %bb.0:
 ; X86-NEXT:    movl {{[0-9]+}}(%esp), %eax
-; X86-NEXT:    movsd {{.*#+}} xmm0 = mem[0],zero
-; X86-NEXT:    movsd %xmm0, (%eax)
+; X86-NEXT:    movl $555819297, 4(%eax) # imm = 0x21212121
+; X86-NEXT:    movl $555819297, (%eax) # imm = 0x21212121
 ; X86-NEXT:    retl
 ;
 ; X64-LABEL: shuf5:

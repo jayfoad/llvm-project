@@ -17843,11 +17843,18 @@ SDValue DAGCombiner::visitEXTRACT_VECTOR_ELT(SDNode *N) {
   unsigned VecEltBitWidth = VecVT.getScalarSizeInBits();
 
   // If all bits of the extracted element are known, return it as a constant.
-  if (IndexC && ScalarVT.isInteger() && ScalarVT == VecVT.getVectorElementType()) {
+  if (IndexC && ScalarVT == VecVT.getVectorElementType()) {
     APInt DemandedElts = APInt::getOneBitSet(NumElts, IndexC->getZExtValue());
     KnownBits Known = DAG.computeKnownBits(VecOp, DemandedElts);
-    if (Known.isConstant())
-      return DAG.getConstant(Known.getConstant(), DL, ScalarVT);
+    if (Known.isConstant()) {
+      APInt KnownVal = Known.getConstant();
+      if (ScalarVT.isInteger())
+        return DAG.getConstant(KnownVal, DL, ScalarVT);
+      if (ScalarVT.isFloatingPoint())
+        return DAG.getConstantFP(
+            APFloat(DAG.EVTToAPFloatSemantics(ScalarVT), KnownVal), DL,
+            ScalarVT);
+    }
   }
 
   // TODO: These transforms should not require the 'hasOneUse' restriction, but

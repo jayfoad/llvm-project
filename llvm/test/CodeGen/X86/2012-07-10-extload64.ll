@@ -21,8 +21,8 @@ define void @store_64(<2 x i32>* %ptr) {
 ; CHECK-LABEL: store_64:
 ; CHECK:       # %bb.0: # %BB
 ; CHECK-NEXT:    movl {{[0-9]+}}(%esp), %eax
-; CHECK-NEXT:    xorps %xmm0, %xmm0
-; CHECK-NEXT:    movlps %xmm0, (%eax)
+; CHECK-NEXT:    movl $0, 4(%eax)
+; CHECK-NEXT:    movl $0, (%eax)
 ; CHECK-NEXT:    retl
 BB:
   store <2 x i32> zeroinitializer, <2 x i32>* %ptr
