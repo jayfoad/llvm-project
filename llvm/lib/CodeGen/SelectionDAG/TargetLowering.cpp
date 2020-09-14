@@ -2259,6 +2259,10 @@ bool TargetLowering::SimplifyDemandedBits(
       return TLO.CombineTo(Op, TLO.DAG.getConstant(Known.One, dl, VT));
   }
 
+  // Should be a no-op, because callers shouldn't trust known bits information
+  // for undemanded bits.
+  Known.Zero &= DemandedBits;
+  Known.One &= DemandedBits;
   return false;
 }
 

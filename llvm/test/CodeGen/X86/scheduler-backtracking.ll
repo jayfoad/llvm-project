@@ -691,45 +691,33 @@ define i64 @test4(i64 %a, i64 %b) nounwind {
 ; ILP-LABEL: test4:
 ; ILP:       # %bb.0:
 ; ILP-NEXT:    xorl %ecx, %ecx
-; ILP-NEXT:    xorl %edx, %edx
 ; ILP-NEXT:    incq %rsi
-; ILP-NEXT:    sete %dl
+; ILP-NEXT:    sete %cl
 ; ILP-NEXT:    movl $2, %eax
 ; ILP-NEXT:    cmpq %rdi, %rsi
-; ILP-NEXT:    sbbq $0, %rdx
-; ILP-NEXT:    movl $0, %edx
-; ILP-NEXT:    sbbq %rdx, %rdx
-; ILP-NEXT:    sbbq %rcx, %rcx
+; ILP-NEXT:    sbbq $0, %rcx
 ; ILP-NEXT:    adcq $-1, %rax
 ; ILP-NEXT:    retq
 ;
 ; HYBRID-LABEL: test4:
 ; HYBRID:       # %bb.0:
 ; HYBRID-NEXT:    xorl %ecx, %ecx
-; HYBRID-NEXT:    xorl %edx, %edx
 ; HYBRID-NEXT:    incq %rsi
-; HYBRID-NEXT:    sete %dl
+; HYBRID-NEXT:    sete %cl
 ; HYBRID-NEXT:    movl $2, %eax
 ; HYBRID-NEXT:    cmpq %rdi, %rsi
-; HYBRID-NEXT:    sbbq $0, %rdx
-; HYBRID-NEXT:    movl $0, %edx
-; HYBRID-NEXT:    sbbq %rdx, %rdx
-; HYBRID-NEXT:    sbbq %rcx, %rcx
+; HYBRID-NEXT:    sbbq $0, %rcx
 ; HYBRID-NEXT:    adcq $-1, %rax
 ; HYBRID-NEXT:    retq
 ;
 ; BURR-LABEL: test4:
 ; BURR:       # %bb.0:
 ; BURR-NEXT:    xorl %ecx, %ecx
-; BURR-NEXT:    xorl %edx, %edx
 ; BURR-NEXT:    incq %rsi
-; BURR-NEXT:    sete %dl
+; BURR-NEXT:    sete %cl
 ; BURR-NEXT:    movl $2, %eax
 ; BURR-NEXT:    cmpq %rdi, %rsi
-; BURR-NEXT:    sbbq $0, %rdx
-; BURR-NEXT:    movl $0, %edx
-; BURR-NEXT:    sbbq %rdx, %rdx
-; BURR-NEXT:    sbbq %rcx, %rcx
+; BURR-NEXT:    sbbq $0, %rcx
 ; BURR-NEXT:    adcq $-1, %rax
 ; BURR-NEXT:    retq
 ;
@@ -738,12 +726,8 @@ define i64 @test4(i64 %a, i64 %b) nounwind {
 ; SRC-NEXT:    xorl %eax, %eax
 ; SRC-NEXT:    incq %rsi
 ; SRC-NEXT:    sete %al
-; SRC-NEXT:    xorl %ecx, %ecx
 ; SRC-NEXT:    cmpq %rdi, %rsi
 ; SRC-NEXT:    sbbq $0, %rax
-; SRC-NEXT:    movl $0, %eax
-; SRC-NEXT:    sbbq %rax, %rax
-; SRC-NEXT:    sbbq %rcx, %rcx
 ; SRC-NEXT:    movl $2, %eax
 ; SRC-NEXT:    adcq $-1, %rax
 ; SRC-NEXT:    retq
@@ -752,14 +736,10 @@ define i64 @test4(i64 %a, i64 %b) nounwind {
 ; LIN:       # %bb.0:
 ; LIN-NEXT:    movl $2, %eax
 ; LIN-NEXT:    xorl %ecx, %ecx
-; LIN-NEXT:    xorl %edx, %edx
 ; LIN-NEXT:    incq %rsi
-; LIN-NEXT:    sete %dl
+; LIN-NEXT:    sete %cl
 ; LIN-NEXT:    cmpq %rdi, %rsi
-; LIN-NEXT:    sbbq $0, %rdx
-; LIN-NEXT:    movl $0, %edx
-; LIN-NEXT:    sbbq %rdx, %rdx
-; LIN-NEXT:    sbbq %rcx, %rcx
+; LIN-NEXT:    sbbq $0, %rcx
 ; LIN-NEXT:    adcq $-1, %rax
 ; LIN-NEXT:    retq
   %r = zext i64 %b to i256
