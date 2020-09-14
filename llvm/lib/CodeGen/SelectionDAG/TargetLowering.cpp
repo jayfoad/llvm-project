@@ -1208,6 +1208,9 @@ bool TargetLowering::SimplifyDemandedBits(
     if (SimplifyDemandedBits(Op0, ~Known.Zero & DemandedBits, DemandedElts,
                              Known2, TLO, Depth + 1))
       return true;
+    // Remove possibly inaccurate information about undemanded bits.
+    Known2.Zero &= ~Known.Zero;
+    Known2.One &= ~Known.Zero;
     assert(!Known2.hasConflict() && "Bits known to be one AND zero?");
 
     // Attempt to avoid multi-use ops if we don't need anything from them.
@@ -1255,6 +1258,9 @@ bool TargetLowering::SimplifyDemandedBits(
     if (SimplifyDemandedBits(Op0, ~Known.One & DemandedBits, DemandedElts,
                              Known2, TLO, Depth + 1))
       return true;
+    // Remove possibly inaccurate information about undemanded bits.
+    Known2.Zero &= ~Known.One;
+    Known2.One &= ~Known.One;
     assert(!Known2.hasConflict() && "Bits known to be one AND zero?");
 
     // Attempt to avoid multi-use ops if we don't need anything from them.

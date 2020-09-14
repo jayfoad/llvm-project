@@ -341,6 +341,7 @@ define <4 x i32> @combine_vec_lshr_lzcnt_bit1(<4 x i32> %x) {
 ; SSE-NEXT:    pshufb %xmm0, %xmm3
 ; SSE-NEXT:    movdqa %xmm0, %xmm1
 ; SSE-NEXT:    psrlw $4, %xmm1
+; SSE-NEXT:    pand {{.*}}(%rip), %xmm1
 ; SSE-NEXT:    pxor %xmm4, %xmm4
 ; SSE-NEXT:    pshufb %xmm1, %xmm2
 ; SSE-NEXT:    pcmpeqb %xmm4, %xmm1
@@ -367,6 +368,7 @@ define <4 x i32> @combine_vec_lshr_lzcnt_bit1(<4 x i32> %x) {
 ; AVX-NEXT:    vmovdqa {{.*#+}} xmm1 = [4,3,2,2,1,1,1,1,0,0,0,0,0,0,0,0]
 ; AVX-NEXT:    vpshufb %xmm0, %xmm1, %xmm2
 ; AVX-NEXT:    vpsrlw $4, %xmm0, %xmm3
+; AVX-NEXT:    vpand {{.*}}(%rip), %xmm3, %xmm3
 ; AVX-NEXT:    vpxor %xmm4, %xmm4, %xmm4
 ; AVX-NEXT:    vpcmpeqb %xmm4, %xmm3, %xmm5
 ; AVX-NEXT:    vpand %xmm5, %xmm2, %xmm2
