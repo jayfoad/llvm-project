@@ -802,6 +802,19 @@ bool AMDGPUTargetLowering::isSDNodeAlwaysUniform(const SDNode *N) const {
       return true;
     return false;
   }
+  if (auto *MN = dyn_cast<MachineSDNode>(N)) {
+    switch (MN->getMachineOpcode()) {
+    case AMDGPU::V_READFIRSTLANE_B32:
+    case AMDGPU::V_READLANE_B32:
+      // TODO: add more opcodes
+      // TODO: generate from .td files?
+      return true;
+    }
+    for (auto *MMO : MN->memoperands()) {
+      if (MMO->getAddrSpace() == AMDGPUAS::CONSTANT_ADDRESS_32BIT)
+        return true;
+    }
+  }
   return false;
 }
 

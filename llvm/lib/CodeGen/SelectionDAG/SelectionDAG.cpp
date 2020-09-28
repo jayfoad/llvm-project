@@ -7912,21 +7912,18 @@ void SelectionDAG::setNodeMemRefs(MachineSDNode *N,
                                   ArrayRef<MachineMemOperand *> NewMemRefs) {
   if (NewMemRefs.empty()) {
     N->clearMemRefs();
-    return;
-  }
-
-  // Check if we can avoid allocating by storing a single reference directly.
-  if (NewMemRefs.size() == 1) {
+  } else if (NewMemRefs.size() == 1) {
+    // Avoid allocating by storing a single reference directly.
     N->MemRefs = NewMemRefs[0];
     N->NumMemRefs = 1;
-    return;
+  } else {
+    MachineMemOperand **MemRefsBuffer =
+        Allocator.template Allocate<MachineMemOperand *>(NewMemRefs.size());
+    llvm::copy(NewMemRefs, MemRefsBuffer);
+    N->MemRefs = MemRefsBuffer;
+    N->NumMemRefs = static_cast<int>(NewMemRefs.size());
   }
-
-  MachineMemOperand **MemRefsBuffer =
-      Allocator.template Allocate<MachineMemOperand *>(NewMemRefs.size());
-  llvm::copy(NewMemRefs, MemRefsBuffer);
-  N->MemRefs = MemRefsBuffer;
-  N->NumMemRefs = static_cast<int>(NewMemRefs.size());
+  updateDivergence(N);
 }
 
 /// SelectNodeTo - These are wrappers around MorphNodeTo that accept a

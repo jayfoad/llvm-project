@@ -11710,6 +11710,55 @@ bool SITargetLowering::isSDNodeSourceOfDivergence(
     return AMDGPU::isIntrinsicSourceOfDivergence(
         cast<ConstantSDNode>(N->getOperand(1))->getZExtValue());
   }
+  if (auto *MN = dyn_cast<MachineSDNode>(N)) {
+    switch (MN->getMachineOpcode()) {
+    case AMDGPU::DS_SWIZZLE_B32:
+    case AMDGPU::GLOBAL_ATOMIC_CSUB_RTN:
+    case AMDGPU::SI_PS_LIVE:
+    case AMDGPU::V_INTERP_MOV_F32:
+    case AMDGPU::V_INTERP_P1LL_F16:
+    case AMDGPU::V_INTERP_P1_F32:
+    case AMDGPU::V_INTERP_P2_F16:
+    case AMDGPU::V_INTERP_P2_F32:
+    case AMDGPU::V_MBCNT_HI_U32_B32_e64:
+    case AMDGPU::V_MBCNT_LO_U32_B32_e64:
+    case AMDGPU::V_MFMA_F32_16X16X16F16:
+    case AMDGPU::V_MFMA_F32_16X16X1F32:
+    case AMDGPU::V_MFMA_F32_16X16X2BF16:
+    case AMDGPU::V_MFMA_F32_16X16X4F16:
+    case AMDGPU::V_MFMA_F32_16X16X4F32:
+    case AMDGPU::V_MFMA_F32_16X16X8BF16:
+    case AMDGPU::V_MFMA_F32_32X32X1F32:
+    case AMDGPU::V_MFMA_F32_32X32X2BF16:
+    case AMDGPU::V_MFMA_F32_32X32X2F32:
+    case AMDGPU::V_MFMA_F32_32X32X4BF16:
+    case AMDGPU::V_MFMA_F32_32X32X4F16:
+    case AMDGPU::V_MFMA_F32_32X32X8F16:
+    case AMDGPU::V_MFMA_F32_4X4X1F32:
+    case AMDGPU::V_MFMA_F32_4X4X2BF16:
+    case AMDGPU::V_MFMA_F32_4X4X4F16:
+    case AMDGPU::V_MFMA_I32_16X16X16I8:
+    case AMDGPU::V_MFMA_I32_16X16X4I8:
+    case AMDGPU::V_MFMA_I32_32X32X4I8:
+    case AMDGPU::V_MFMA_I32_32X32X8I8:
+    case AMDGPU::V_MFMA_I32_4X4X4I8:
+    case AMDGPU::V_MOV_B32_dpp8_gfx10:
+    case AMDGPU::V_MOV_B32_dpp:
+    case AMDGPU::V_MOV_B64_DPP_PSEUDO:
+    case AMDGPU::V_PERMLANE16_B32:
+    case AMDGPU::V_PERMLANEX16_B32:
+    case AMDGPU::V_WRITELANE_B32:
+      // TODO: add more opcodes
+      // TODO: generate from .td files?
+      return true;
+    }
+    for (auto *MMO : MN->memoperands()) {
+      unsigned AS = MMO->getAddrSpace();
+      // A flat load may access private memory.
+      if (AS == AMDGPUAS::PRIVATE_ADDRESS || AS == AMDGPUAS::FLAT_ADDRESS)
+        return true;
+    }
+  }
   return false;
 }
 
