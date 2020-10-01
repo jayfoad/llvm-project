@@ -774,6 +774,16 @@ public:
     return HasFlatSegmentOffsetBug;
   }
 
+  // Return true if a flat instructions accessing address space \p AS could
+  // suffer from the bug.
+  bool hasFlatSegmentOffsetBug(unsigned AS) const {
+    // The bug affects accesses to global memory. If AS is GLOBAL_ADDRESS then
+    // it's definitely affected. If AS is FLAT_ADDRESS then it might be
+    // affected.
+    return hasFlatSegmentOffsetBug() &&
+           (AS == AMDGPUAS::FLAT_ADDRESS || AS == AMDGPUAS::GLOBAL_ADDRESS);
+  }
+
   bool hasFlatLgkmVMemCountInOrder() const {
     return getGeneration() > GFX9;
   }

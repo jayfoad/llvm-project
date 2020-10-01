@@ -1680,9 +1680,11 @@ bool AMDGPUDAGToDAGISel::SelectFlatOffset(SDNode *N,
                                           SDValue &Offset) const {
   int64_t OffsetVal = 0;
 
+  // IsSigned means we're asking about a global_* instruction, but the flat
+  // segment offset bug only affects flat_* instructions.
   if (Subtarget->hasFlatInstOffsets() &&
-      (!Subtarget->hasFlatSegmentOffsetBug() ||
-       findMemSDNode(N)->getAddressSpace() != AMDGPUAS::FLAT_ADDRESS)) {
+      (IsSigned || !Subtarget->hasFlatSegmentOffsetBug(
+                       findMemSDNode(N)->getAddressSpace()))) {
     SDValue N0, N1;
     if (CurDAG->isBaseWithConstantOffset(Addr)) {
       N0 = Addr.getOperand(0);

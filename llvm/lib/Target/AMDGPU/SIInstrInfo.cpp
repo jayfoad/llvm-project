@@ -6895,12 +6895,6 @@ bool SIInstrInfo::isBufferSMRD(const MachineInstr &MI) const {
 
 unsigned SIInstrInfo::getNumFlatOffsetBits(unsigned AddrSpace,
                                            bool Signed) const {
-  if (!ST.hasFlatInstOffsets())
-    return 0;
-
-  if (ST.hasFlatSegmentOffsetBug() && AddrSpace == AMDGPUAS::FLAT_ADDRESS)
-    return 0;
-
   if (ST.getGeneration() >= AMDGPUSubtarget::GFX10)
     return Signed ? 12 : 11;
 
@@ -6913,7 +6907,9 @@ bool SIInstrInfo::isLegalFLATOffset(int64_t Offset, unsigned AddrSpace,
   if (!ST.hasFlatInstOffsets())
     return false;
 
-  if (ST.hasFlatSegmentOffsetBug() && AddrSpace == AMDGPUAS::FLAT_ADDRESS)
+  // Signed means we're asking about a global_* instruction, but this bug only
+  // affects flat_* instructions.
+  if (!Signed && ST.hasFlatSegmentOffsetBug(AddrSpace))
     return false;
 
   if (ST.getGeneration() >= AMDGPUSubtarget::GFX10)
