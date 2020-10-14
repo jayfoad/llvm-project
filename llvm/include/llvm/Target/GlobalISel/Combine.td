@@ -505,6 +505,22 @@ def ptr_add_with_zero: GICombineRule<
          [{ return Helper.matchPtrAddZero(*${root}); }]),
   (apply [{ return Helper.applyPtrAddZero(*${root}); }])>;
 
+def regs_small_vec : GIDefMatchData<"SmallVector<Register, 4>">;
+def combine_consecutive_insert_vec_elts : GICombineRule<
+  (defs root:$root, regs_small_vec:$info),
+  (match (wip_match_opcode G_INSERT_VECTOR_ELT):$root,
+    [{ return Helper.matchConsecutiveInsertVecElts(*${root}, ${info}); }]),
+  (apply [{ return Helper.applyBuildVecFromRegs(*${root}, ${info}); }])>;
+
+def combine_ins_vec_build_vec : GICombineRule<
+  (defs root:$root, regs_small_vec:$info),
+  (match (wip_match_opcode G_INSERT_VECTOR_ELT):$root,
+    [{ return Helper.matchInsertVecEltBuildVec(*${root}, ${info}); }]),
+  (apply [{ return Helper.applyBuildVecFromRegs(*${root}, ${info}); }])>;
+
+def insert_vec_elt_combines : GICombineGroup<[combine_consecutive_insert_vec_elts,
+                                              combine_ins_vec_build_vec]>;
+
 // FIXME: These should use the custom predicate feature once it lands.
 def undef_combines : GICombineGroup<[undef_to_fp_zero, undef_to_int_zero,
                                      undef_to_negative_one,
@@ -532,7 +548,7 @@ def select_combines : GICombineGroup<[select_undef_cmp, select_constant_cmp]>;
 def trivial_combines : GICombineGroup<[copy_prop, mul_to_shl, add_p2i_to_ptradd,
                                        mul_by_neg_one]>;
 
-def all_combines : GICombineGroup<[trivial_combines, ptr_add_immed_chain,
+def all_combines : GICombineGroup<[trivial_combines, insert_vec_elt_combines, ptr_add_immed_chain,
     combines_for_extload, combine_indexed_load_store, undef_combines,
     identity_combines, simplify_add_to_sub,
     hoist_logic_op_with_same_opcode_hands,

@@ -2431,6 +2431,97 @@ bool CombinerHelper::matchSimplifyAddToSub(
   return CheckFold(LHS, RHS) || CheckFold(RHS, LHS);
 }
 
+bool CombinerHelper::matchConsecutiveInsertVecElts(
+    MachineInstr &MI, SmallVectorImpl<Register> &MatchInfo) {
+  assert(MI.getOpcode() == TargetOpcode::G_INSERT_VECTOR_ELT &&
+         "Invalid opcode");
+  Register DstReg = MI.getOperand(0).getReg();
+  LLT DstTy = MRI.getType(DstReg);
+  assert(DstTy.isVector() && "Invalid G_INSERT_VECTOR_ELT?");
+  unsigned NumElts = DstTy.getNumElements();
+  auto Index = getConstantVRegVal(MI.getOperand(3).getReg(), MRI);
+  if (!Index || *Index != (NumElts - 1))
+    return false;
+  SmallVector<std::pair<Register, unsigned>, 4> Inserts;
+  // Try to collect various InsertElts.
+  MachineInstr *CurrInst = &MI;
+  MachineInstr *TmpInst;
+  int64_t IntImm;
+  Register TmpReg;
+  while (mi_match(
+      CurrInst->getOperand(0).getReg(), MRI,
+      m_GInsertVecElt(m_MInstr(TmpInst), m_Reg(TmpReg), m_ICst(IntImm)))) {
+    if (IntImm >= NumElts)
+      return false;
+    // We only want to follow along insert_vec_elts until undef.
+    // If not let other combines deal with this.
+    if (TmpInst->getOpcode() != TargetOpcode::G_INSERT_VECTOR_ELT &&
+        TmpInst->getOpcode() != TargetOpcode::G_IMPLICIT_DEF)
+      return false;
+    Inserts.emplace_back(TmpReg, IntImm);
+    CurrInst = TmpInst;
+  }
+
+  llvm::sort(Inserts,
+            [](const std::pair<Register, unsigned> &P1,
+               const std::pair<Register, unsigned> &P2) {
+              return P1.second < P2.second;
+            });
+  // Remove duplicate writes to the same index by keeping the latest.
+  Inserts.erase(std::unique(Inserts.begin(), Inserts.end(),
+                            [](const std::pair<Register, unsigned> &P1,
+                               const std::pair<Register, unsigned> &P2) {
+                              return P1.second == P2.second;
+                            }),
+                Inserts.end());
+  assert(Inserts.size() <= NumElts && "Expecting <= NumElts");
+  for (unsigned I = 0, InputI = 0; I < NumElts; ++I) {
+    Register TmpReg;
+    if (Inserts[InputI].second == I)
+      TmpReg = Inserts[InputI++].first;
+    MatchInfo.push_back(TmpReg);
+  }
+  return true;
+}
+
+bool CombinerHelper::applyBuildVecFromRegs(
+    MachineInstr &MI, SmallVectorImpl<Register> &MatchInfo) {
+  Builder.setInstr(MI);
+  Register UndefReg;
+  auto GetUndef = [&]() {
+    if (UndefReg.isValid())
+      return UndefReg;
+    LLT DstTy = MRI.getType(MI.getOperand(0).getReg());
+    UndefReg = Builder.buildUndef(DstTy.getScalarType()).getReg(0);
+    return UndefReg;
+  };
+  for (unsigned I = 0; I < MatchInfo.size(); ++I) {
+    if (!MatchInfo[I].isValid())
+      MatchInfo[I] = GetUndef();
+  }
+  Builder.buildBuildVector(MI.getOperand(0).getReg(), MatchInfo);
+  MI.eraseFromParent();
+  return true;
+}
+
+bool CombinerHelper::matchInsertVecEltBuildVec(
+    MachineInstr &MI, SmallVectorImpl<Register> &MatchInfo) {
+  Register SrcVecReg = MI.getOperand(1).getReg();
+  MachineInstr *SrcMI = MRI.getVRegDef(SrcVecReg);
+  Register EltReg = MI.getOperand(2).getReg();
+  Register IdxReg = MI.getOperand(3).getReg();
+  auto IdxCst = getConstantVRegVal(IdxReg, MRI);
+  if (!IdxCst)
+    return false;
+  if (SrcMI->getOpcode() == TargetOpcode::G_BUILD_VECTOR) {
+    for (auto &Op : SrcMI->uses())
+      MatchInfo.push_back(Op.getReg());
+    MatchInfo[*IdxCst] = EltReg;
+    return true;
+  }
+  return false;
+}
+
 bool CombinerHelper::applySimplifyAddToSub(
     MachineInstr &MI, std::tuple<Register, Register> &MatchInfo) {
   Builder.setInstr(MI);
