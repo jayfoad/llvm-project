@@ -276,8 +276,10 @@ entry:
 ; EGCM-DAG: T{{[0-9]\.[XYZW]}}, KC0[3].Y
 ; EGCM-DAG: T{{[0-9]\.[XYZW]}}, KC0[3].Z
 ; EGCM-DAG: T{{[0-9]\.[XYZW]}}, KC0[3].W
-; SI: s_load_dwordx4 s{{\[[0-9]:[0-9]+\]}}, s[0:1], 0xd
-; MESA-VI: s_load_dwordx4 s{{\[[0-9]:[0-9]+\]}}, s[0:1], 0x34
+; SI: s_load_dword s{{[0-9]+}}, s[0:1], 0xf
+; SI: s_load_dwordx2 s{{\[[0-9]:[0-9]+\]}}, s[0:1], 0xd
+; MESA-VI: s_load_dwordx2 s{{\[[0-9]:[0-9]+\]}}, s[0:1], 0x34
+; MESA-VI: s_load_dword s{{[0-9]+}}, s[0:1], 0x3c
 ; HSA-GFX9: s_load_dwordx4 s[{{[0-9]+:[0-9]+}}], s[4:5], 0x10
 define amdgpu_kernel void @v3i32_arg(<3 x i32> addrspace(1)* nocapture %out, <3 x i32> %in) nounwind {
 entry:
@@ -291,8 +293,10 @@ entry:
 ; EGCM-DAG: T{{[0-9]\.[XYZW]}}, KC0[3].Y
 ; EGCM-DAG: T{{[0-9]\.[XYZW]}}, KC0[3].Z
 ; EGCM-DAG: T{{[0-9]\.[XYZW]}}, KC0[3].W
-; SI: s_load_dwordx4 s{{\[[0-9]:[0-9]+\]}}, s[0:1], 0xd
-; MESA-VI: s_load_dwordx4 s{{\[[0-9]:[0-9]+\]}}, s[0:1], 0x34
+; SI: s_load_dword s{{[0-9]+}}, s[0:1], 0xf
+; SI: s_load_dwordx2 s{{\[[0-9]:[0-9]+\]}}, s[0:1], 0xd
+; MESA-VI: s_load_dwordx2 s{{\[[0-9]:[0-9]+\]}}, s[0:1], 0x34
+; MESA-VI: s_load_dword s{{[0-9]+}}, s[0:1], 0x3c
 ; HSA-GFX9: s_load_dwordx4 s[{{[0-9]+:[0-9]+}}], s[4:5], 0x10
 define amdgpu_kernel void @v3f32_arg(<3 x float> addrspace(1)* nocapture %out, <3 x float> %in) nounwind {
 entry:

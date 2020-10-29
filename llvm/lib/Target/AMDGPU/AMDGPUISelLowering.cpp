@@ -1571,12 +1571,12 @@ SDValue AMDGPUTargetLowering::WidenVectorLoad(SDValue Op,
                                               SelectionDAG &DAG) const {
   LoadSDNode *Load = cast<LoadSDNode>(Op);
   EVT VT = Op.getValueType();
-  assert(VT.getVectorNumElements() == 3);
+  unsigned BaseAlign = Load->getAlignment();
+  assert(VT.getVectorNumElements() == 3 && BaseAlign >= 16);
   SDValue BasePtr = Load->getBasePtr();
   EVT MemVT = Load->getMemoryVT();
   SDLoc SL(Op);
   const MachinePointerInfo &SrcValue = Load->getMemOperand()->getPointerInfo();
-  unsigned BaseAlign = Load->getAlignment();
 
   EVT WideVT =
       EVT::getVectorVT(*DAG.getContext(), VT.getVectorElementType(), 4);

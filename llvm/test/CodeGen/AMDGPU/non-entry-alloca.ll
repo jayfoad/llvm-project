@@ -17,30 +17,32 @@ define amdgpu_kernel void @kernel_non_entry_block_static_alloca_uniformly_reache
 ; MUBUF:       ; %bb.0: ; %entry
 ; MUBUF-NEXT:    s_add_u32 flat_scratch_lo, s6, s9
 ; MUBUF-NEXT:    s_addc_u32 flat_scratch_hi, s7, 0
+; MUBUF-NEXT:    s_load_dwordx2 s[6:7], s[4:5], 0x8
 ; MUBUF-NEXT:    s_add_u32 s0, s0, s9
-; MUBUF-NEXT:    s_load_dwordx4 s[8:11], s[4:5], 0x8
 ; MUBUF-NEXT:    s_addc_u32 s1, s1, 0
 ; MUBUF-NEXT:    s_movk_i32 s32, 0x400
 ; MUBUF-NEXT:    s_mov_b32 s33, 0
 ; MUBUF-NEXT:    s_waitcnt lgkmcnt(0)
-; MUBUF-NEXT:    s_cmp_lg_u32 s8, 0
+; MUBUF-NEXT:    s_cmp_lg_u32 s6, 0
 ; MUBUF-NEXT:    s_cbranch_scc1 BB0_3
 ; MUBUF-NEXT:  ; %bb.1: ; %bb.0
-; MUBUF-NEXT:    s_cmp_lg_u32 s9, 0
+; MUBUF-NEXT:    s_load_dword s6, s[4:5], 0x10
+; MUBUF-NEXT:    s_cmp_lg_u32 s7, 0
 ; MUBUF-NEXT:    s_cbranch_scc1 BB0_3
 ; MUBUF-NEXT:  ; %bb.2: ; %bb.1
-; MUBUF-NEXT:    s_add_i32 s6, s32, 0x1000
+; MUBUF-NEXT:    s_add_i32 s7, s32, 0x1000
+; MUBUF-NEXT:    s_waitcnt lgkmcnt(0)
+; MUBUF-NEXT:    s_lshl_b32 s6, s6, 2
 ; MUBUF-NEXT:    v_mov_b32_e32 v1, 0
-; MUBUF-NEXT:    v_mov_b32_e32 v2, s6
-; MUBUF-NEXT:    s_lshl_b32 s7, s10, 2
-; MUBUF-NEXT:    s_mov_b32 s32, s6
+; MUBUF-NEXT:    v_mov_b32_e32 v2, s7
 ; MUBUF-NEXT:    buffer_store_dword v1, v2, s[0:3], 0 offen
 ; MUBUF-NEXT:    v_mov_b32_e32 v1, 1
-; MUBUF-NEXT:    s_add_i32 s6, s6, s7
+; MUBUF-NEXT:    s_add_i32 s6, s7, s6
 ; MUBUF-NEXT:    buffer_store_dword v1, v2, s[0:3], 0 offen offset:4
 ; MUBUF-NEXT:    v_mov_b32_e32 v1, s6
 ; MUBUF-NEXT:    buffer_load_dword v1, v1, s[0:3], 0 offen
 ; MUBUF-NEXT:    s_load_dwordx2 s[4:5], s[4:5], 0x0
+; MUBUF-NEXT:    s_mov_b32 s32, s7
 ; MUBUF-NEXT:    s_waitcnt vmcnt(0)
 ; MUBUF-NEXT:    v_add_u32_e32 v2, v1, v0
 ; MUBUF-NEXT:    s_waitcnt lgkmcnt(0)
@@ -55,29 +57,31 @@ define amdgpu_kernel void @kernel_non_entry_block_static_alloca_uniformly_reache
 ; FLATSCR-LABEL: kernel_non_entry_block_static_alloca_uniformly_reached_align4:
 ; FLATSCR:       ; %bb.0: ; %entry
 ; FLATSCR-NEXT:    s_add_u32 flat_scratch_lo, s6, s9
-; FLATSCR-NEXT:    s_load_dwordx4 s[8:11], s[4:5], 0x8
 ; FLATSCR-NEXT:    s_addc_u32 flat_scratch_hi, s7, 0
+; FLATSCR-NEXT:    s_load_dwordx2 s[6:7], s[4:5], 0x8
 ; FLATSCR-NEXT:    s_mov_b32 s32, 16
 ; FLATSCR-NEXT:    s_mov_b32 s33, 0
 ; FLATSCR-NEXT:    s_waitcnt lgkmcnt(0)
-; FLATSCR-NEXT:    s_cmp_lg_u32 s8, 0
+; FLATSCR-NEXT:    s_cmp_lg_u32 s6, 0
 ; FLATSCR-NEXT:    s_cbranch_scc1 BB0_3
 ; FLATSCR-NEXT:  ; %bb.1: ; %bb.0
-; FLATSCR-NEXT:    s_cmp_lg_u32 s9, 0
+; FLATSCR-NEXT:    s_load_dword s6, s[4:5], 0x10
+; FLATSCR-NEXT:    s_cmp_lg_u32 s7, 0
 ; FLATSCR-NEXT:    s_cbranch_scc1 BB0_3
 ; FLATSCR-NEXT:  ; %bb.2: ; %bb.1
-; FLATSCR-NEXT:    s_mov_b32 s6, s32
-; FLATSCR-NEXT:    s_movk_i32 s7, 0x1000
-; FLATSCR-NEXT:    s_add_i32 s8, s6, s7
-; FLATSCR-NEXT:    s_add_u32 s6, s6, s7
+; FLATSCR-NEXT:    s_mov_b32 s7, s32
+; FLATSCR-NEXT:    s_movk_i32 s8, 0x1000
+; FLATSCR-NEXT:    s_add_i32 s9, s7, s8
+; FLATSCR-NEXT:    s_add_u32 s7, s7, s8
 ; FLATSCR-NEXT:    v_mov_b32_e32 v1, 0
-; FLATSCR-NEXT:    scratch_store_dword off, v1, s6
+; FLATSCR-NEXT:    scratch_store_dword off, v1, s7
 ; FLATSCR-NEXT:    v_mov_b32_e32 v1, 1
-; FLATSCR-NEXT:    s_lshl_b32 s6, s10, 2
-; FLATSCR-NEXT:    s_mov_b32 s32, s8
-; FLATSCR-NEXT:    scratch_store_dword off, v1, s8 offset:4
-; FLATSCR-NEXT:    s_add_i32 s8, s8, s6
-; FLATSCR-NEXT:    scratch_load_dword v1, off, s8
+; FLATSCR-NEXT:    s_waitcnt lgkmcnt(0)
+; FLATSCR-NEXT:    s_lshl_b32 s6, s6, 2
+; FLATSCR-NEXT:    s_mov_b32 s32, s9
+; FLATSCR-NEXT:    scratch_store_dword off, v1, s9 offset:4
+; FLATSCR-NEXT:    s_add_i32 s9, s9, s6
+; FLATSCR-NEXT:    scratch_load_dword v1, off, s9
 ; FLATSCR-NEXT:    s_load_dwordx2 s[4:5], s[4:5], 0x0
 ; FLATSCR-NEXT:    s_waitcnt vmcnt(0)
 ; FLATSCR-NEXT:    v_add_u32_e32 v2, v1, v0

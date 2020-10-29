@@ -8058,7 +8058,7 @@ SDValue SITargetLowering::LowerLOAD(SDValue Op, SelectionDAG &DAG) const {
     if (!Op->isDivergent() && Alignment >= 4 && NumElements < 32) {
       if (MemVT.isPow2VectorType())
         return SDValue();
-      if (NumElements == 3)
+      if (NumElements == 3 && Alignment >= 16)
         return WidenVectorLoad(Op, DAG);
       return SplitVectorLoad(Op, DAG);
     }
@@ -8076,7 +8076,7 @@ SDValue SITargetLowering::LowerLOAD(SDValue Op, SelectionDAG &DAG) const {
         Alignment >= 4 && NumElements < 32) {
       if (MemVT.isPow2VectorType())
         return SDValue();
-      if (NumElements == 3)
+      if (NumElements == 3 && Alignment >= 16)
         return WidenVectorLoad(Op, DAG);
       return SplitVectorLoad(Op, DAG);
     }
@@ -8093,7 +8093,9 @@ SDValue SITargetLowering::LowerLOAD(SDValue Op, SelectionDAG &DAG) const {
       return SplitVectorLoad(Op, DAG);
     // v3 loads not supported on SI.
     if (NumElements == 3 && !Subtarget->hasDwordx3LoadStores())
-      return WidenVectorLoad(Op, DAG);
+      // Widen v3 loads when the alignment is 16-byte or higher.
+      return Alignment < 16 ? SplitVectorLoad(Op, DAG)
+                            : WidenVectorLoad(Op, DAG);
     // v3 and v4 loads are supported for private and global memory.
     return SDValue();
   }
@@ -8117,7 +8119,9 @@ SDValue SITargetLowering::LowerLOAD(SDValue Op, SelectionDAG &DAG) const {
         return SplitVectorLoad(Op, DAG);
       // v3 loads not supported on SI.
       if (NumElements == 3 && !Subtarget->hasDwordx3LoadStores())
-        return WidenVectorLoad(Op, DAG);
+        // Widen v3 loads when the alignment is 16-byte or higher.
+        return Alignment < 16 ? SplitVectorLoad(Op, DAG)
+                              : WidenVectorLoad(Op, DAG);
       return SDValue();
     default:
       llvm_unreachable("unsupported private_element_size");
