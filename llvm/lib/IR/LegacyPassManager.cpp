@@ -12,6 +12,7 @@
 
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/Statistic.h"
 #include "llvm/IR/DiagnosticInfo.h"
 #include "llvm/IR/IRPrintingPasses.h"
@@ -637,9 +638,15 @@ PMTopLevelManager::PMTopLevelManager(PMDataManager *PMDM) {
 /// Set pass P as the last user of the given analysis passes.
 void
 PMTopLevelManager::setLastUser(ArrayRef<Pass*> AnalysisPasses, Pass *P) {
+  if (AnalysisPasses.empty())
+    return;
+
   unsigned PDepth = 0;
   if (P->getResolver())
     PDepth = P->getResolver()->getPMDataManager().getDepth();
+
+  SetVector<Pass *> LastUses;
+  SetVector<Pass *> LastPMUses;
 
   for (Pass *AP : AnalysisPasses) {
     LastUser[AP] = P;
@@ -650,8 +657,6 @@ PMTopLevelManager::setLastUser(ArrayRef<Pass*> AnalysisPasses, Pass *P) {
     // Update the last users of passes that are required transitive by AP.
     AnalysisUsage *AnUsage = findAnalysisUsage(AP);
     const AnalysisUsage::VectorType &IDs = AnUsage->getRequiredTransitiveSet();
-    SmallVector<Pass *, 12> LastUses;
-    SmallVector<Pass *, 12> LastPMUses;
     for (AnalysisID ID : IDs) {
       Pass *AnalysisPass = findAnalysisPass(ID);
       assert(AnalysisPass && "Expected analysis pass to exist.");
@@ -660,18 +665,10 @@ PMTopLevelManager::setLastUser(ArrayRef<Pass*> AnalysisPasses, Pass *P) {
       unsigned APDepth = AR->getPMDataManager().getDepth();
 
       if (PDepth == APDepth)
-        LastUses.push_back(AnalysisPass);
+        LastUses.insert(AnalysisPass);
       else if (PDepth > APDepth)
-        LastPMUses.push_back(AnalysisPass);
+        LastPMUses.insert(AnalysisPass);
     }
-
-    setLastUser(LastUses, P);
-
-    // If this pass has a corresponding pass manager, push higher level
-    // analysis to this pass manager.
-    if (P->getResolver())
-      setLastUser(LastPMUses, P->getResolver()->getPMDataManager().getAsPass());
-
 
     // If AP is the last user of other passes then make P last user of
     // such passes.
@@ -680,6 +677,14 @@ PMTopLevelManager::setLastUser(ArrayRef<Pass*> AnalysisPasses, Pass *P) {
         LU.second = P;
     }
   }
+
+  setLastUser(LastUses.getArrayRef(), P);
+
+  // If this pass has a corresponding pass manager, push higher level
+  // analysis to this pass manager.
+  if (P->getResolver())
+    setLastUser(LastPMUses.getArrayRef(),
+                P->getResolver()->getPMDataManager().getAsPass());
 }
 
 /// Collect passes whose last user is P
