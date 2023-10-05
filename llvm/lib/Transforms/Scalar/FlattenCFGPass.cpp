@@ -18,6 +18,7 @@
 #include "llvm/Transforms/Scalar.h"
 #include "llvm/Transforms/Scalar/FlattenCFG.h"
 #include "llvm/Transforms/Utils/Local.h"
+#include "llvm/Transforms/Utils.h"
 
 using namespace llvm;
 
@@ -34,6 +35,7 @@ public:
 
   void getAnalysisUsage(AnalysisUsage &AU) const override {
     AU.addRequired<AAResultsWrapperPass>();
+    AU.addPreservedID(LowerSwitchID);
   }
 
 private:

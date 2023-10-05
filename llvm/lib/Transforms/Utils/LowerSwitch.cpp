@@ -593,11 +593,11 @@ char LowerSwitchLegacyPass::ID = 0;
 char &llvm::LowerSwitchID = LowerSwitchLegacyPass::ID;
 
 INITIALIZE_PASS_BEGIN(LowerSwitchLegacyPass, "lowerswitch",
-                      "Lower SwitchInst's to branches", false, false)
+                      "Lower SwitchInst's to branches", true, false)
 INITIALIZE_PASS_DEPENDENCY(AssumptionCacheTracker)
 INITIALIZE_PASS_DEPENDENCY(LazyValueInfoWrapperPass)
 INITIALIZE_PASS_END(LowerSwitchLegacyPass, "lowerswitch",
-                    "Lower SwitchInst's to branches", false, false)
+                    "Lower SwitchInst's to branches", true, false)
 
 // createLowerSwitchPass - Interface to this file...
 FunctionPass *llvm::createLowerSwitchPass() {

@@ -34,6 +34,9 @@ namespace {
       initializeLowerInvokeLegacyPassPass(*PassRegistry::getPassRegistry());
     }
     bool runOnFunction(Function &F) override;
+    void getAnalysisUsage(AnalysisUsage &AU) const override {
+      AU.addPreservedID(LowerSwitchID);
+    }
   };
 }
 

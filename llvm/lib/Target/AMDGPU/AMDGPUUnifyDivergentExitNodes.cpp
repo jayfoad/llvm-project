@@ -96,6 +96,8 @@ INITIALIZE_PASS_END(AMDGPUUnifyDivergentExitNodes, DEBUG_TYPE,
                     "Unify divergent function exit nodes", false, false)
 
 void AMDGPUUnifyDivergentExitNodes::getAnalysisUsage(AnalysisUsage &AU) const {
+  AU.addRequiredID(LowerSwitchID);
+
   if (RequireAndPreserveDomTree)
     AU.addRequired<DominatorTreeWrapperPass>();
 

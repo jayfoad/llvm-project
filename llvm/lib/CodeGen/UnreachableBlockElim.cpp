@@ -33,6 +33,7 @@
 #include "llvm/InitializePasses.h"
 #include "llvm/Pass.h"
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
+#include "llvm/Transforms/Utils.h"
 using namespace llvm;
 
 namespace {
@@ -50,6 +51,7 @@ public:
 
   void getAnalysisUsage(AnalysisUsage &AU) const override {
     AU.addPreserved<DominatorTreeWrapperPass>();
+    AU.addPreservedID(LowerSwitchID);
   }
 };
 }
