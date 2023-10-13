@@ -278,6 +278,10 @@ bool SIFoldOperands::updateOperand(FoldCandidate &Fold) const {
         .addReg(AMDGPU::VCC, RegState::Kill);
     }
 
+    unsigned Inst32OpNo = AMDGPU::getNamedOperandIdx(Op32, AMDGPU::OpName::src0);
+    assert(Inst32->getOperand(Inst32OpNo)
+           .isIdenticalTo(MI->getOperand(Fold.UseOpNo)));
+
     // Keep the old instruction around to avoid breaking iterators, but
     // replace it with a dummy instruction to remove uses.
     //
@@ -293,8 +297,7 @@ bool SIFoldOperands::updateOperand(FoldCandidate &Fold) const {
       TII->commuteInstruction(*Inst32, false);
 
     Fold.UseMI = Inst32;
-    Fold.UseOpNo = AMDGPU::getNamedOperandIdx(Fold.UseMI->getOpcode(),
-                                              AMDGPU::OpName::src0);
+    Fold.UseOpNo = Inst32OpNo;
     MI = Fold.UseMI;
     Old = &MI->getOperand(Fold.UseOpNo);
   }
