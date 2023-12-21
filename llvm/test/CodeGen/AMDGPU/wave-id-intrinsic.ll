@@ -4,15 +4,15 @@
 ; RUN: llc -mtriple=amdgcn-amd-amdpal -mcpu=gfx1200 --verify-machineinstrs < %s | FileCheck -check-prefixes=GFX12,GFX12-SDAG %s
 ; RUN: llc -mtriple=amdgcn-amd-amdpal -mcpu=gfx1200 -global-isel --verify-machineinstrs < %s | FileCheck -check-prefixes=GFX12,GFX12-GISEL %s
 
-define amdgpu_cs void @test_wave_id(ptr addrspace(1) %out) {
-; GFX9-LABEL: test_wave_id:
+define amdgpu_cs void @test_wave_id_cs(ptr addrspace(1) %out) {
+; GFX9-LABEL: test_wave_id_cs:
 ; GFX9:       ; %bb.0:
 ; GFX9-NEXT:    s_bfe_u32 s0, ttmp8, 0x50019
 ; GFX9-NEXT:    v_mov_b32_e32 v2, s0
 ; GFX9-NEXT:    global_store_dword v[0:1], v2, off
 ; GFX9-NEXT:    s_endpgm
 ;
-; GFX12-LABEL: test_wave_id:
+; GFX12-LABEL: test_wave_id_cs:
 ; GFX12:       ; %bb.0:
 ; GFX12-NEXT:    s_bfe_u32 s0, ttmp8, 0x50019
 ; GFX12-NEXT:    s_delay_alu instid0(SALU_CYCLE_1)
@@ -21,6 +21,21 @@ define amdgpu_cs void @test_wave_id(ptr addrspace(1) %out) {
 ; GFX12-NEXT:    s_nop 0
 ; GFX12-NEXT:    s_sendmsg sendmsg(MSG_DEALLOC_VGPRS)
 ; GFX12-NEXT:    s_endpgm
+  %waveid = call i32 @llvm.amdgcn.wave.id()
+  store i32 %waveid, ptr addrspace(1) %out
+  ret void
+}
+
+define amdgpu_gfx void @test_wave_id_gfx(ptr addrspace(1) %out) {
+; GFX9-LABEL: test_wave_id_gfx:
+; GFX9:       ; %bb.0:
+; GFX9-NEXT:    s_waitcnt vmcnt(0) expcnt(0) lgkmcnt(0)
+; GFX9-NEXT:    s_setpc_b64 s[30:31]
+;
+; GFX12-LABEL: test_wave_id_gfx:
+; GFX12:       ; %bb.0:
+; GFX12-NEXT:    s_waitcnt vmcnt(0) expcnt(0) lgkmcnt(0)
+; GFX12-NEXT:    s_setpc_b64 s[30:31]
   %waveid = call i32 @llvm.amdgcn.wave.id()
   store i32 %waveid, ptr addrspace(1) %out
   ret void

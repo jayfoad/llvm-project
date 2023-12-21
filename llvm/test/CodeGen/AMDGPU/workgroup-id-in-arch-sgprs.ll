@@ -141,6 +141,28 @@ define amdgpu_kernel void @workgroup_id_xyz(ptr addrspace(1) %ptrx, ptr addrspac
   ret void
 }
 
+define amdgpu_cs void @workgroup_id_xyz_cs(ptr addrspace(1) %ptrx, ptr addrspace(1) %ptry, ptr addrspace(1) %ptrz) {
+  %idx = call i32 @llvm.amdgcn.workgroup.id.x()
+  store i32 %idx, ptr addrspace(1) %ptrx
+  %idy = call i32 @llvm.amdgcn.workgroup.id.y()
+  store i32 %idy, ptr addrspace(1) %ptry
+  %idz = call i32 @llvm.amdgcn.workgroup.id.z()
+  store i32 %idz, ptr addrspace(1) %ptrz
+
+  ret void
+}
+
+define amdgpu_gfx void @workgroup_id_xyz_gfx(ptr addrspace(1) %ptrx, ptr addrspace(1) %ptry, ptr addrspace(1) %ptrz) {
+  %idx = call i32 @llvm.amdgcn.workgroup.id.x()
+  store i32 %idx, ptr addrspace(1) %ptrx
+  %idy = call i32 @llvm.amdgcn.workgroup.id.y()
+  store i32 %idy, ptr addrspace(1) %ptry
+  %idz = call i32 @llvm.amdgcn.workgroup.id.z()
+  store i32 %idz, ptr addrspace(1) %ptrz
+
+  ret void
+}
+
 declare i32 @llvm.amdgcn.workgroup.id.x()
 declare i32 @llvm.amdgcn.workgroup.id.y()
 declare i32 @llvm.amdgcn.workgroup.id.z()
