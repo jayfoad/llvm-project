@@ -35,6 +35,7 @@
 #include "mlir/Dialect/OpenMP/OpenMPOpsEnums.cpp.inc"
 #include "mlir/Dialect/OpenMP/OpenMPOpsInterfaces.cpp.inc"
 #include "mlir/Dialect/OpenMP/OpenMPTypeInterfaces.cpp.inc"
+#include "mlir/Support/LogicalResult.h"
 
 using namespace mlir;
 using namespace mlir::omp;
@@ -428,17 +429,15 @@ static void printScheduleClause(OpAsmPrinter &p, Operation *op,
 // Parser, printer and verifier for ReductionVarList
 //===----------------------------------------------------------------------===//
 
-static ParseResult
-parseWsReduction(OpAsmParser &parser, Region &region,
-                 SmallVectorImpl<OpAsmParser::UnresolvedOperand> &operands,
-                 SmallVectorImpl<Type> &types, ArrayAttr &reductionSymbols) {
-
-  // possibly parse reduction
+ParseResult parseReductionClause(
+    OpAsmParser &parser, Region &region,
+    SmallVectorImpl<OpAsmParser::UnresolvedOperand> &operands,
+    SmallVectorImpl<Type> &types, ArrayAttr &reductionSymbols,
+    SmallVectorImpl<OpAsmParser::Argument> &privates) {
   if (failed(parser.parseOptionalKeyword("reduction")))
-    return parser.parseRegion(region);
+    return failure();
 
   SmallVector<SymbolRefAttr> reductionVec;
-  SmallVector<OpAsmParser::Argument> privates;
 
   if (failed(
           parser.parseCommaSeparatedList(OpAsmParser::Delimiter::Paren, [&]() {
@@ -452,28 +451,46 @@ parseWsReduction(OpAsmParser &parser, Region &region,
           })))
     return failure();
 
-  for (std::size_t i = 0; i < privates.size(); ++i) {
-    privates[i].type = types[i];
+  for (auto [prv, type] : llvm::zip_equal(privates, types)) {
+    prv.type = type;
   }
   SmallVector<Attribute> reductions(reductionVec.begin(), reductionVec.end());
   reductionSymbols = ArrayAttr::get(parser.getContext(), reductions);
-  return parser.parseRegion(region, privates);
+  return success();
 }
 
-void printWsReduction(OpAsmPrinter &p, Operation *op, Region &region,
-                      ValueRange operands, TypeRange types,
-                      ArrayAttr reductionSymbols) {
-  if (reductionSymbols) {
-    p << "reduction(";
-    llvm::interleaveComma(llvm::zip_equal(reductionSymbols, operands,
-                                          region.front().getArguments(), types),
-                          p, [&p](auto t) {
-                            auto [sym, op, arg, type] = t;
-                            p << sym << " " << op << " -> " << arg << " : "
-                              << type;
-                          });
-    p << ") ";
-  }
+static void printReductionClause(OpAsmPrinter &p, Operation *op, Region &region,
+                                 ValueRange operands, TypeRange types,
+                                 ArrayAttr reductionSymbols) {
+  p << "reduction(";
+  llvm::interleaveComma(llvm::zip_equal(reductionSymbols, operands,
+                                        region.front().getArguments(), types),
+                        p, [&p](auto t) {
+                          auto [sym, op, arg, type] = t;
+                          p << sym << " " << op << " -> " << arg << " : "
+                            << type;
+                        });
+  p << ") ";
+}
+
+static ParseResult
+parseParallelRegion(OpAsmParser &parser, Region &region,
+                    SmallVectorImpl<OpAsmParser::UnresolvedOperand> &operands,
+                    SmallVectorImpl<Type> &types, ArrayAttr &reductionSymbols) {
+
+  llvm::SmallVector<OpAsmParser::Argument> privates;
+  if (succeeded(parseReductionClause(parser, region, operands, types,
+                                     reductionSymbols, privates)))
+    return parser.parseRegion(region, privates);
+
+  return parser.parseRegion(region);
+}
+
+static void printParallelRegion(OpAsmPrinter &p, Operation *op, Region &region,
+                                ValueRange operands, TypeRange types,
+                                ArrayAttr reductionSymbols) {
+  if (reductionSymbols)
+    printReductionClause(p, op, region, operands, types, reductionSymbols);
   p.printRegion(region, /*printEntryBlockArgs=*/false);
 }
 
@@ -1164,6 +1181,7 @@ parseLoopControl(OpAsmParser &parser, Region &region,
   loopVarTypes = SmallVector<Type>(ivs.size(), loopVarType);
   for (auto &iv : ivs)
     iv.type = loopVarType;
+
   return parser.parseRegion(region, ivs);
 }
 

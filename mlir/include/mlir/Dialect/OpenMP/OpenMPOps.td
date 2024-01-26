@@ -209,7 +209,7 @@ def ParallelOp : OpenMP_Op<"parallel", [
                 $allocators_vars, type($allocators_vars)
               ) `)`
           | `proc_bind` `(` custom<ClauseAttr>($proc_bind_val) `)`
-    ) custom<WsReduction>($region, $reduction_vars, type($reduction_vars), $reductions) attr-dict
+    ) custom<ParallelRegion>($region, $reduction_vars, type($reduction_vars), $reductions) attr-dict
   }];
   let hasVerifier = 1;
 }
