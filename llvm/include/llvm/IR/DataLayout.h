@@ -470,8 +470,8 @@ public:
   ///
   /// For example, returns 5 for i36 and 10 for x86_fp80.
   TypeSize getTypeStoreSize(Type *Ty) const {
-    TypeSize BaseSize = getTypeSizeInBits(Ty);
-    return {divideCeil(BaseSize.getKnownMinValue(), 8), BaseSize.isScalable()};
+    TypeSize SizeInBits = getTypeStoreSizeInBits(Ty);
+    return {SizeInBits.getKnownMinValue() / 8, SizeInBits.isScalable()};
   }
 
   /// Returns the maximum number of bits that may be overwritten by
@@ -482,7 +482,8 @@ public:
   ///
   /// For example, returns 40 for i36 and 80 for x86_fp80.
   TypeSize getTypeStoreSizeInBits(Type *Ty) const {
-    return 8 * getTypeStoreSize(Ty);
+    TypeSize BaseSize = getTypeSizeInBits(Ty);
+    return {alignTo(BaseSize.getKnownMinValue(), 8), BaseSize.isScalable()};
   }
 
   /// Returns true if no extra padding bits are needed when storing the
