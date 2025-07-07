@@ -280,8 +280,8 @@ public:
   // Get the sum of this register's register unit weights.
   unsigned getWeight(const CodeGenRegBank &RegBank) const;
 
-  // Canonically ordered set.
-  typedef std::vector<const CodeGenRegister *> Vec;
+  // Canonically ordered set of register enum values.
+  typedef std::vector<unsigned> Vec;
 
 private:
   bool SubRegsComplete;
@@ -471,7 +471,9 @@ public:
 
   // Get the set of registers.  This set contains the same registers as
   // getOrder(0).
-  ArrayRef<const CodeGenRegister *> members() const { return Members; }
+  ArrayRef<unsigned> numbers() const { return Members; }
+  ArrayRef<const CodeGenRegister *>
+  registers(const CodeGenRegBank &RegBank) const { return {}; }
   unsigned size() const { return Members.size(); }
   bool empty() const { return Members.empty(); }
 
@@ -495,14 +497,14 @@ public:
   // sub-classes.  Note the ordering provided by this key is not the same as
   // the topological order used for the EnumValues.
   struct Key {
-    ArrayRef<const CodeGenRegister *> Members;
+    ArrayRef<unsigned> Members;
     RegSizeInfoByHwMode RSI;
 
-    Key(ArrayRef<const CodeGenRegister *> M, const RegSizeInfoByHwMode &I)
+    Key(ArrayRef<unsigned> M, const RegSizeInfoByHwMode &I)
         : Members(M), RSI(I) {}
 
     Key(const CodeGenRegisterClass &RC)
-        : Members(RC.members()), RSI(RC.RSI) {}
+        : Members(RC.Members), RSI(RC.RSI) {}
 
     // Lexicographical order of (Members, RegSizeInfoByHwMode).
     bool operator<(const Key &) const;
@@ -671,7 +673,7 @@ class CodeGenRegBank {
   // Create a synthetic sub-class if it is missing. Returns (RC, inserted).
   std::pair<CodeGenRegisterClass *, bool>
   getOrCreateSubClass(const CodeGenRegisterClass *RC,
-                      ArrayRef<const CodeGenRegister *> Members, StringRef Name);
+                      ArrayRef<unsigned> Members, StringRef Name);
 
   // Infer missing register classes.
   void computeInferredRegisterClasses();
