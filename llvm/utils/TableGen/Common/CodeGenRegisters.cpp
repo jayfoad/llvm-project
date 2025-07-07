@@ -204,12 +204,12 @@ namespace {
 
 // Iterate over all register units in a set of registers.
 class RegUnitIterator {
-  CodeGenRegister::Vec::const_iterator RegI, RegE;
+  ArrayRef<const CodeGenRegister *>::const_iterator RegI, RegE;
   CodeGenRegister::RegUnitList::iterator UnitI, UnitE;
   static CodeGenRegister::RegUnitList Sentinel;
 
 public:
-  RegUnitIterator(const CodeGenRegister::Vec &Regs)
+  RegUnitIterator(ArrayRef<const CodeGenRegister *> Regs)
       : RegI(Regs.begin()), RegE(Regs.end()) {
 
     if (RegI == RegE) {
@@ -819,7 +819,7 @@ CodeGenRegisterClass::CodeGenRegisterClass(CodeGenRegBank &RegBank,
 // class structure has been computed.
 CodeGenRegisterClass::CodeGenRegisterClass(CodeGenRegBank &RegBank,
                                            StringRef Name, Key Props)
-    : Members(*Props.Members), TheDef(nullptr), Name(Name.str()),
+    : Members(Props.Members), TheDef(nullptr), Name(Name.str()),
       RegsWithSuperRegsTopoSigs(RegBank.getNumTopoSigs()), EnumValue(-1),
       RSI(Props.RSI), CopyCost(0), Allocatable(true), AllocationPriority(0),
       GlobalPriority(false), TSFlags(0) {
@@ -906,7 +906,7 @@ namespace llvm {
 
 raw_ostream &operator<<(raw_ostream &OS, const CodeGenRegisterClass::Key &K) {
   OS << "{ " << K.RSI;
-  for (const auto R : *K.Members)
+  for (const auto R : K.Members)
     OS << ", " << R->getName();
   return OS << " }";
 }
@@ -917,8 +917,7 @@ raw_ostream &operator<<(raw_ostream &OS, const CodeGenRegisterClass::Key &K) {
 // It is not the same as the topological order provided by TopoOrderRC.
 bool CodeGenRegisterClass::Key::operator<(
     const CodeGenRegisterClass::Key &B) const {
-  assert(Members && B.Members);
-  return std::tie(*Members, RSI) < std::tie(*B.Members, B.RSI);
+  return std::tie(Members, RSI) < std::tie(B.Members, B.RSI);
 }
 
 // Returns true if RC is a strict subclass.
@@ -933,7 +932,7 @@ bool CodeGenRegisterClass::Key::operator<(
 static bool testSubClass(const CodeGenRegisterClass *A,
                          const CodeGenRegisterClass *B) {
   return A->RSI.isSubClassOf(B->RSI) &&
-         llvm::includes(A->getMembers(), B->getMembers(), deref<std::less<>>());
+         llvm::includes(A->members(), B->members(), deref<std::less<>>());
 }
 
 /// Sorting predicate for register classes.  This provides a topological
@@ -958,9 +957,9 @@ static bool TopoOrderRC(const CodeGenRegisterClass &A,
   // computed yet, but the members set is always valid. Also, since we use
   // std::tie() < operator for ordering, we can achieve the descending set size
   // ordering by using (SIZET_MAX - set_size) in the std::tie.
-  return std::tuple(A.RSI, SIZET_MAX - A.getMembers().size(),
+  return std::tuple(A.RSI, SIZET_MAX - A.size(),
                     StringRef(A.getName())) <
-         std::tuple(B.RSI, SIZET_MAX - B.getMembers().size(),
+         std::tuple(B.RSI, SIZET_MAX - B.size(),
                     StringRef(B.getName()));
 }
 
@@ -1042,9 +1041,9 @@ CodeGenRegisterClass::getMatchingSubClassWithSubRegs(
     // register class.
     if (A == B)
       return false;
-    if (A->getMembers().size() == B->getMembers().size())
+    if (A->size() == B->size())
       return A == this;
-    return A->getMembers().size() > B->getMembers().size();
+    return A->size() > B->size();
   };
 
   std::list<CodeGenRegisterClass> &RegClasses = RegBank.getRegClasses();
@@ -1104,7 +1103,7 @@ CodeGenRegisterClass::getMatchingSubClassWithSubRegs(
         // LOW32_ADDR_ACCESS_RBP is a valid choice but contains registers that
         // aren't subregisters of SuperRegRC whereas GR32 has a direct 1:1
         // mapping.
-        if (SuperRegRC->getMembers().size() >= SubRegRC->getMembers().size())
+        if (SuperRegRC->size() >= SubRegRC->size())
           return std::pair(ChosenSuperRegClass, SubRegRC);
       }
     }
@@ -1356,7 +1355,7 @@ void CodeGenRegBank::addToMaps(CodeGenRegisterClass *RC) {
 // Create a synthetic sub-class if it is missing.
 std::pair<CodeGenRegisterClass *, bool>
 CodeGenRegBank::getOrCreateSubClass(const CodeGenRegisterClass *RC,
-                                    const CodeGenRegister::Vec *Members,
+                                    ArrayRef<const CodeGenRegister *> Members,
                                     StringRef Name) {
   // Synthetic sub-class has the same size and alignment as RC.
   CodeGenRegisterClass::Key K(Members, RC->RSI);
@@ -1799,7 +1798,7 @@ static void computeUberSets(std::vector<UberRegSet> &UberSets,
     if (!RegClass.Allocatable)
       continue;
 
-    const CodeGenRegister::Vec &Regs = RegClass.getMembers();
+    ArrayRef<const CodeGenRegister *> Regs = RegClass.members();
     if (Regs.empty())
       continue;
 
@@ -2264,7 +2263,7 @@ void CodeGenRegBank::computeDerivedInfo() {
   for (CodeGenRegisterClass &RC : RegClasses) {
     RC.HasDisjunctSubRegs = false;
     RC.CoveredBySubRegs = true;
-    for (const CodeGenRegister *Reg : RC.getMembers()) {
+    for (const CodeGenRegister *Reg : RC.members()) {
       RC.HasDisjunctSubRegs |= Reg->HasDisjunctSubRegs;
       RC.CoveredBySubRegs &= Reg->CoveredBySubRegs;
     }
@@ -2305,8 +2304,8 @@ void CodeGenRegBank::inferCommonSubClass(CodeGenRegisterClass *RC) {
       continue;
 
     // Compute the set intersection of RC1 and RC2.
-    const CodeGenRegister::Vec &Memb1 = RC1->getMembers();
-    const CodeGenRegister::Vec &Memb2 = RC2->getMembers();
+    ArrayRef<const CodeGenRegister *> Memb1 = RC1->members();
+    ArrayRef<const CodeGenRegister *> Memb2 = RC2->members();
     CodeGenRegister::Vec Intersection;
     std::set_intersection(Memb1.begin(), Memb1.end(), Memb2.begin(),
                           Memb2.end(),
@@ -2322,7 +2321,7 @@ void CodeGenRegBank::inferCommonSubClass(CodeGenRegisterClass *RC) {
     if (RC2->RSI.hasStricterSpillThan(RC1->RSI))
       std::swap(RC1, RC2);
 
-    getOrCreateSubClass(RC1, &Intersection,
+    getOrCreateSubClass(RC1, Intersection,
                         RC1->getName() + "_and_" + RC2->getName());
   }
 }
@@ -2341,7 +2340,7 @@ void CodeGenRegBank::inferSubClassWithSubReg(CodeGenRegisterClass *RC) {
 
   // Compute the set of registers supporting each SubRegIndex.
   SubReg2SetMap SRSets;
-  for (const CodeGenRegister *R : RC->getMembers()) {
+  for (const CodeGenRegister *R : RC->members()) {
     if (R->Artificial)
       continue;
     const CodeGenRegister::SubRegMap &SRM = R->getSubRegs();
@@ -2360,7 +2359,7 @@ void CodeGenRegBank::inferSubClassWithSubReg(CodeGenRegisterClass *RC) {
     if (I == SRSets.end())
       continue;
     // In most cases, all RC registers support the SubRegIndex.
-    if (I->second.size() == RC->getMembers().size()) {
+    if (I->second.size() == RC->size()) {
       RC->setSubClassWithSubReg(&SubIdx, RC);
       continue;
     }
@@ -2368,7 +2367,7 @@ void CodeGenRegBank::inferSubClassWithSubReg(CodeGenRegisterClass *RC) {
       continue;
     // This is a real subset.  See if we have a matching class.
     CodeGenRegisterClass *SubRC =
-        getOrCreateSubClass(RC, &I->second,
+        getOrCreateSubClass(RC, I->second,
                             RC->getName() + "_with_" + I->first->getName())
             .first;
     RC->setSubClassWithSubReg(&SubIdx, SubRC);
@@ -2407,7 +2406,7 @@ void CodeGenRegBank::inferMatchingSuperRegClass(
     // that the list may contain entries with the same Sub but different Supers.
     SubToSuperRegs.clear();
     TopoSigs.reset();
-    for (const CodeGenRegister *Super : RC->getMembers()) {
+    for (const CodeGenRegister *Super : RC->members()) {
       const CodeGenRegister *Sub = Super->getSubRegs().find(SubIdx)->second;
       assert(Sub && "Missing sub-register");
       SubToSuperRegs.emplace_back(Sub, Super);
@@ -2431,7 +2430,7 @@ void CodeGenRegBank::inferMatchingSuperRegClass(
       // Compute the subset of RC that maps into SubRC with a single linear scan
       // through SubToSuperRegs and the members of SubRC.
       CodeGenRegister::Vec SubSetVec;
-      auto SubI = SubRC.getMembers().begin(), SubE = SubRC.getMembers().end();
+      auto SubI = SubRC.members().begin(), SubE = SubRC.members().end();
       for (auto &[Sub, Super] : SubToSuperRegs) {
         while (SubI != SubE && **SubI < *Sub)
           ++SubI;
@@ -2446,7 +2445,7 @@ void CodeGenRegBank::inferMatchingSuperRegClass(
 
       // RC injects completely into SubRC.
       sortAndUniqueRegisters(SubSetVec);
-      if (SubSetVec.size() == RC->getMembers().size()) {
+      if (SubSetVec.size() == RC->size()) {
         SubRC.addSuperRegClass(SubIdx, RC);
 
         // We can skip checking subregister indices that can be composed from
@@ -2489,7 +2488,7 @@ void CodeGenRegBank::inferMatchingSuperRegClass(
       }
 
       auto [SubSetRC, Inserted] = getOrCreateSubClass(
-          RC, &SubSetVec,
+          RC, SubSetVec,
           RC->getName() + "_with_" + CompositeSubIdx->getName() + "_in_" +
               CompositeSubRC->getName());
 
@@ -2651,10 +2650,10 @@ CodeGenRegBank::getSuperRegForSubReg(const ValueTypeByHwMode &ValueTy,
   // Find and return the largest of our candidate classes.
   llvm::stable_sort(Candidates, [&](const CodeGenRegisterClass *A,
                                     const CodeGenRegisterClass *B) {
-    if (A->getMembers().size() > B->getMembers().size())
+    if (A->size() > B->size())
       return true;
 
-    if (A->getMembers().size() < B->getMembers().size())
+    if (A->size() < B->size())
       return false;
 
     // Order by name as a tie-breaker.

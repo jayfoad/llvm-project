@@ -209,9 +209,8 @@ void RegisterInfoEmitter::EmitRegUnitPressure(raw_ostream &OS,
      << "getRegClassWeight(const TargetRegisterClass *RC) const {\n"
      << "  static const RegClassWeight RCWeightTable[] = {\n";
   for (const auto &RC : RegBank.getRegClasses()) {
-    const CodeGenRegister::Vec &Regs = RC.getMembers();
     OS << "    {" << RC.getWeight(RegBank) << ", ";
-    if (Regs.empty() || RC.Artificial)
+    if (RC.empty() || RC.Artificial)
       OS << '0';
     else {
       std::vector<unsigned> RegUnits;
@@ -1644,7 +1643,7 @@ void RegisterInfoEmitter::runTargetDesc(raw_ostream &OS) {
       for (const CodeGenRegister &Reg : Regs) {
         const CodeGenRegisterClass *BaseRC = nullptr;
         for (const CodeGenRegisterClass *RC : BaseClasses) {
-          if (is_contained(RC->getMembers(), &Reg)) {
+          if (RC->contains(&Reg)) {
             BaseRC = RC;
             break;
           }
@@ -1882,7 +1881,7 @@ void RegisterInfoEmitter::debugDump(raw_ostream &OS) {
     OS << " }\n\tSpillAlignment: {";
     for (unsigned M = 0; M != NumModes; ++M)
       OS << ' ' << getModeName(M) << ':' << RC.RSI.get(M).SpillAlignment;
-    OS << " }\n\tNumRegs: " << RC.getMembers().size() << '\n';
+    OS << " }\n\tNumRegs: " << RC.size() << '\n';
     OS << "\tLaneMask: " << PrintLaneMask(RC.LaneMask) << '\n';
     OS << "\tHasDisjunctSubRegs: " << RC.HasDisjunctSubRegs << '\n';
     OS << "\tCoveredBySubRegs: " << RC.CoveredBySubRegs << '\n';
@@ -1890,9 +1889,8 @@ void RegisterInfoEmitter::debugDump(raw_ostream &OS) {
     OS << "\tAllocationPriority: " << unsigned(RC.AllocationPriority) << '\n';
     OS << "\tBaseClassOrder: " << RC.getBaseClassOrder() << '\n';
     OS << "\tRegs:";
-    for (const CodeGenRegister *R : RC.getMembers()) {
+    for (const CodeGenRegister *R : RC.members())
       OS << " " << R->getName();
-    }
     OS << '\n';
     OS << "\tSubClasses:";
     const BitVector &SubClasses = RC.getSubClasses();

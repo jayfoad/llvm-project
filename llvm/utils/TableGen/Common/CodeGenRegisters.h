@@ -471,7 +471,9 @@ public:
 
   // Get the set of registers.  This set contains the same registers as
   // getOrder(0).
-  const CodeGenRegister::Vec &getMembers() const { return Members; }
+  ArrayRef<const CodeGenRegister *> members() const { return Members; }
+  unsigned size() const { return Members.size(); }
+  bool empty() const { return Members.empty(); }
 
   // Get a bit vector of TopoSigs of registers with super registers in this
   // register class.
@@ -493,14 +495,14 @@ public:
   // sub-classes.  Note the ordering provided by this key is not the same as
   // the topological order used for the EnumValues.
   struct Key {
-    const CodeGenRegister::Vec *Members;
+    ArrayRef<const CodeGenRegister *> Members;
     RegSizeInfoByHwMode RSI;
 
-    Key(const CodeGenRegister::Vec *M, const RegSizeInfoByHwMode &I)
+    Key(ArrayRef<const CodeGenRegister *> M, const RegSizeInfoByHwMode &I)
         : Members(M), RSI(I) {}
 
     Key(const CodeGenRegisterClass &RC)
-        : Members(&RC.getMembers()), RSI(RC.RSI) {}
+        : Members(RC.members()), RSI(RC.RSI) {}
 
     // Lexicographical order of (Members, RegSizeInfoByHwMode).
     bool operator<(const Key &) const;
@@ -669,7 +671,7 @@ class CodeGenRegBank {
   // Create a synthetic sub-class if it is missing. Returns (RC, inserted).
   std::pair<CodeGenRegisterClass *, bool>
   getOrCreateSubClass(const CodeGenRegisterClass *RC,
-                      const CodeGenRegister::Vec *Membs, StringRef Name);
+                      ArrayRef<const CodeGenRegister *> Members, StringRef Name);
 
   // Infer missing register classes.
   void computeInferredRegisterClasses();
