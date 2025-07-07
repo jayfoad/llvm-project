@@ -203,13 +203,15 @@ void CodeGenRegister::buildObjectGraph(CodeGenRegBank &RegBank) {
 namespace {
 
 // Iterate over all register units in a set of registers.
+template <typename Iter>
 class RegUnitIterator {
-  ArrayRef<const CodeGenRegister *>::const_iterator RegI, RegE;
+  Iter RegI, RegE;
   CodeGenRegister::RegUnitList::iterator UnitI, UnitE;
   static CodeGenRegister::RegUnitList Sentinel;
 
 public:
-  RegUnitIterator(ArrayRef<const CodeGenRegister *> Regs)
+  template <typename Range>
+  RegUnitIterator(Range Regs)
       : RegI(Regs.begin()), RegE(Regs.end()) {
 
     if (RegI == RegE) {
@@ -252,7 +254,10 @@ protected:
   }
 };
 
-CodeGenRegister::RegUnitList RegUnitIterator::Sentinel;
+template <typename Range>
+RegUnitIterator(Range) -> RegUnitIterator<llvm::detail::IterOfRange<Range>>;
+
+//CodeGenRegister::RegUnitList RegUnitIterator::Sentinel;
 
 } // end anonymous namespace
 
@@ -730,8 +735,8 @@ struct TupleExpander : SetTheory::Expander {
 //===----------------------------------------------------------------------===//
 
 static void sortAndUniqueRegisters(CodeGenRegister::Vec &M) {
-  llvm::sort(M, deref<std::less<>>());
-  M.erase(llvm::unique(M, deref<std::equal_to<>>()), M.end());
+  llvm::sort(M);
+  M.erase(llvm::unique(M), M.end());
 }
 
 CodeGenRegisterClass::CodeGenRegisterClass(CodeGenRegBank &RegBank,
@@ -1130,7 +1135,7 @@ void CodeGenRegisterClass::getSuperRegClasses(const CodeGenSubRegIndex *SubIdx,
 void CodeGenRegisterClass::buildRegUnitSet(
     const CodeGenRegBank &RegBank, std::vector<unsigned> &RegUnits) const {
   std::vector<unsigned> TmpUnits;
-  for (RegUnitIterator UnitI(Members); UnitI.isValid(); ++UnitI) {
+  for (RegUnitIterator UnitI(registers(RegBank)); UnitI.isValid(); ++UnitI) {
     const RegUnit &RU = RegBank.getRegUnit(*UnitI);
     if (!RU.Artificial)
       TmpUnits.push_back(*UnitI);
@@ -1848,9 +1853,9 @@ static void computeUberWeights(MutableArrayRef<UberRegSet> UberSets,
     // Initialize all unit weights in this set, and remember the max units/reg.
     unsigned MaxWeight = 0;
     for (unsigned RegNum : S.Regs) {
-      const CodeGenRegister *R = RegBank.(RegNum);
+      const CodeGenRegister &R = RegBank.getRegisters()[RegNum - 1];
       unsigned Weight = 0;
-      for (unsigned U : R->getRegUnits()) {
+      for (unsigned U : R.getRegUnits()) {
         if (!RegBank.getRegUnit(U).Artificial) {
           unsigned UWeight = RegBank.getRegUnit(U).Weight;
           if (!UWeight) {
@@ -1866,8 +1871,10 @@ static void computeUberWeights(MutableArrayRef<UberRegSet> UberSets,
       LLVM_DEBUG({
         dbgs() << "UberSet " << &S - UberSets.begin() << " Weight "
                << MaxWeight;
-        for (const CodeGenRegister *R : S.Regs)
-          dbgs() << " " << R->getName();
+        for (unsigned RegNum : S.Regs) {
+          const CodeGenRegister &R = RegBank.getRegisters()[RegNum - 1];
+          dbgs() << " " << R.getName();
+        }
         dbgs() << '\n';
       });
       // Update the set weight.
@@ -1875,9 +1882,11 @@ static void computeUberWeights(MutableArrayRef<UberRegSet> UberSets,
     }
 
     // Find singular determinants.
-    for (const CodeGenRegister *R : S.Regs)
-      if (R->getRegUnits().count() == 1 && R->getWeight(RegBank) == S.Weight)
-        S.SingularDeterminants |= R->getRegUnits();
+    for (unsigned RegNum : S.Regs) {
+      const CodeGenRegister &R = RegBank.getRegisters()[RegNum - 1];
+      if (R.getRegUnits().count() == 1 && R.getWeight(RegBank) == S.Weight)
+        S.SingularDeterminants |= R.getRegUnits();
+    }
   }
 }
 
@@ -2345,7 +2354,7 @@ void CodeGenRegBank::inferSubClassWithSubReg(CodeGenRegisterClass *RC) {
       continue;
     const CodeGenRegister::SubRegMap &SRM = R->getSubRegs();
     for (auto [I, _] : SRM)
-      SRSets[I].push_back(R);
+      SRSets[I].push_back(R->EnumValue);
   }
 
   for (auto I : SRSets)
@@ -2385,8 +2394,7 @@ void CodeGenRegBank::inferMatchingSuperRegClass(
     CodeGenRegisterClass *RC,
     std::list<CodeGenRegisterClass>::iterator FirstSubRegRC) {
   DenseSet<const CodeGenSubRegIndex *> ImpliedSubRegIndices;
-  std::vector<std::pair<const CodeGenRegister *, const CodeGenRegister *>>
-      SubToSuperRegs;
+  std::vector<std::pair<unsigned, unsigned>> SubToSuperRegs;
   BitVector TopoSigs(getNumTopoSigs());
 
   // Iterate subregister indices in topological order to visit larger indices
@@ -2409,10 +2417,10 @@ void CodeGenRegBank::inferMatchingSuperRegClass(
     for (const CodeGenRegister *Super : RC->registers(*this)) {
       const CodeGenRegister *Sub = Super->getSubRegs().find(SubIdx)->second;
       assert(Sub && "Missing sub-register");
-      SubToSuperRegs.emplace_back(Sub, Super);
+      SubToSuperRegs.emplace_back(Sub->EnumValue, Super->EnumValue);
       TopoSigs.set(Sub->getTopoSig());
     }
-    sort(SubToSuperRegs, on_first<deref<std::less<>>>());
+    sort(SubToSuperRegs, on_first<std::less<>>());
 
     // Iterate over sub-register class candidates.  Ignore classes created by
     // this loop. They will never be useful.
