@@ -240,7 +240,7 @@ class VOP3a<VOPProfile P> : Enc64 {
   let Inst{31-26} = 0x34; //encoding
   let Inst{40-32} = !if(P.HasSrc0, src0, 0);
   let Inst{49-41} = !if(P.HasSrc1, src1, 0);
-  let Inst{58-50} = !if(P.HasSrc2, src2, 0);
+  let Inst{58-50} = !if(P.HasSrc2, src2, 0x100);
   let Inst{60-59} = !if(P.HasOMod, omod, 0);
   let Inst{61}    = !if(P.HasSrc0Mods, src0_modifiers{0}, 0);
   let Inst{62}    = !if(P.HasSrc1Mods, src1_modifiers{0}, 0);
@@ -275,7 +275,7 @@ class VOP3a_t16<VOPProfile P> : Enc64 {
   let Inst{31-26} = 0x35;
   let Inst{40-32} = !if(P.HasSrc0, src0{8-0}, 0);
   let Inst{49-41} = !if(P.HasSrc1, src1{8-0}, 0);
-  let Inst{58-50} = !if(P.HasSrc2, src2{8-0}, 0);
+  let Inst{58-50} = !if(P.HasSrc2, src2{8-0}, 0x100);
   let Inst{60-59} = !if(P.HasOMod, omod, 0);
   let Inst{61}    = !if(P.HasSrc0Mods, src0_modifiers{0}, 0);
   let Inst{62}    = !if(P.HasSrc1Mods, src1_modifiers{0}, 0);
@@ -459,7 +459,7 @@ class VOP3be <VOPProfile P> : Enc64 {
   let Inst{31-26} = 0x34; //encoding
   let Inst{40-32} = !if(P.HasSrc0, src0, 0);
   let Inst{49-41} = !if(P.HasSrc1, src1, 0);
-  let Inst{58-50} = !if(P.HasSrc2, src2, 0);
+  let Inst{58-50} = !if(P.HasSrc2, src2, 0x100);
   let Inst{60-59} = !if(P.HasOMod, omod, 0);
   let Inst{61}    = !if(P.HasSrc0Mods, src0_modifiers{0}, 0);
   let Inst{62}    = !if(P.HasSrc1Mods, src1_modifiers{0}, 0);
@@ -511,7 +511,7 @@ class VOP3Pe <VOPProfile P> : Enc64, VOP3Pe_Base {
 
   let Inst{40-32} = !if(P.HasSrc0, src0, 0);
   let Inst{49-41} = !if(P.HasSrc1, src1, 0);
-  let Inst{58-50} = !if(P.HasSrc2, src2, 0);
+  let Inst{58-50} = !if(P.HasSrc2, src2, 0x100);
   let Inst{59}    = !cond(!and(P.HasSrc0, P.HasOpSel) : src0_modifiers{3},
                           P.IsDOT : 1,
                           P.HasMatrixScale : matrix_b_scale{0},
@@ -548,7 +548,7 @@ class VOP3Pe_MAI <bits<7> op, VOPProfile P, bit acc_cd = 0> : Enc64, VOP3Pe_MAI_
   let Inst{31-23} = 0x1a7; //encoding
   let Inst{40-32} = !if(P.HasSrc0, src0{8-0}, 0);
   let Inst{49-41} = !if(P.HasSrc1, src1{8-0}, 0);
-  let Inst{58-50} = !if(P.HasSrc2, src2, 0);
+  let Inst{58-50} = !if(P.HasSrc2, src2, 0x100);
 
   let Inst{59}    = !if(P.HasSrc0, src0{9}, 0); // acc(0)
   let Inst{60}    = !if(P.HasSrc1, src1{9}, 0); // acc(1)
@@ -955,7 +955,7 @@ class VOP3_DPPe_Common<bits<10> op, VOPProfile P> : VOP3_DPPe_Common_Base<op, P>
 
   let Inst{7-0}   = !if(P.EmitDst, vdst{7-0}, 0);
   let Inst{49-41} = !if(P.HasSrc1, src1, 0);
-  let Inst{58-50} = !if(P.HasSrc2, src2, 0);
+  let Inst{58-50} = !if(P.HasSrc2, src2, 0x100);
 }
 
 class VOP3_DPPe_Common_t16<bits<10> op, VOPProfile P> : VOP3_DPPe_Common_Base<op, P> {
@@ -965,7 +965,7 @@ class VOP3_DPPe_Common_t16<bits<10> op, VOPProfile P> : VOP3_DPPe_Common_Base<op
 
   let Inst{7-0}   = !if(P.EmitDst, vdst{7-0}, 0);
   let Inst{49-41} = !if(P.HasSrc1, src1{8-0}, 0);
-  let Inst{58-50} = !if(P.HasSrc2, src2{8-0}, 0);
+  let Inst{58-50} = !if(P.HasSrc2, src2{8-0}, 0x100);
 }
 
 class VOP3P_DPPe_Common_Base<bits<8> op, VOPProfile P> : Enc96 {
@@ -999,7 +999,7 @@ class VOP3P_DPPe_Common<bits<8> op, VOPProfile P> : VOP3P_DPPe_Common_Base<op, P
 
   let Inst{7-0} = vdst;
   let Inst{49-41} = !if(P.HasSrc1, src1, 0);
-  let Inst{58-50} = !if(P.HasSrc2, src2, 0);
+  let Inst{58-50} = !if(P.HasSrc2, src2, 0x100);
 }
 
 class VOP3P_DPPe_Common_t16<bits<8> op, VOPProfile P> : VOP3P_DPPe_Common_Base<op, P> {
@@ -1009,7 +1009,7 @@ class VOP3P_DPPe_Common_t16<bits<8> op, VOPProfile P> : VOP3P_DPPe_Common_Base<o
 
   let Inst{7-0} = vdst{7-0};
   let Inst{49-41} = !if(P.HasSrc1, src1{8-0}, 0);
-  let Inst{58-50} = !if(P.HasSrc2, src2{8-0}, 0);
+  let Inst{58-50} = !if(P.HasSrc2, src2{8-0}, 0x100);
 }
 
 class VOP_DPP_Pseudo <string OpName, VOPProfile P, list<dag> pattern=[],

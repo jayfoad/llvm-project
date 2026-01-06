@@ -72,7 +72,7 @@ BB5:
 // CHECK:  s_load_dwordx4 s[8:11], s[4:5], 0x40                       // 000000000248: C00A0202 00000040
 // CHECK:  <BB5>:
 // CHECK:  v_ashrrev_i32_e32 v77, 31, v76                             // 000000000250: 229A989F
-// CHECK:  v_lshlrev_b64 v[10:11], 2, v[76:77]                        // 000000000254: D28F000A 00029882
+// CHECK:  v_lshlrev_b64 v[10:11], 2, v[76:77]                        // 000000000254: D28F000A 04029882
 // CHECK:  s_waitcnt lgkmcnt(0)                                       // 00000000025C: BF8C007F
 // CHECK:  v_add_u32_e32 v10, vcc, s8, v10                            // 000000000260: 32141408
 // CHECK:  v_mov_b32_e32 v6, s9                                       // 000000000264: 7E0C0209
