@@ -140,11 +140,11 @@ define amdgpu_kernel void @add_inline_imm_0.0_v2f16(ptr addrspace(1) %out, <2 x 
 
 ; GCN-LABEL: {{^}}add_inline_imm_0.5_v2f16:
 ; GFX10: s_load_{{dword|b32}} [[VAL:s[0-9]+]]
-; GFX10: v_pk_add_f16 [[REG:v[0-9]+]], [[VAL]], 0.5 op_sel_hi:[1,0] ; encoding: [0x00,0x40,0x0f,0xcc,0x02,0xe0,0x01,0x0c]
+; GFX10: v_pk_add_f16 [[REG:v[0-9]+]], [[VAL]], 0.5 op_sel_hi:[1,0] ; encoding: [0x00,0x40,0x0f,0xcc,0x02,0xe0,0x01,0x0a]
 ; GFX10: buffer_store_{{dword|b32}} [[REG]]
 
 ; GFX9: s_load_dword [[VAL:s[0-9]+]]
-; GFX9: v_pk_add_f16 [[REG:v[0-9]+]], [[VAL]], 0.5 op_sel_hi:[1,0] ; encoding: [0x00,0x40,0x8f,0xd3,0x06,0xe0,0x01,0x0c]
+; GFX9: v_pk_add_f16 [[REG:v[0-9]+]], [[VAL]], 0.5 op_sel_hi:[1,0] ; encoding: [0x00,0x40,0x8f,0xd3,0x06,0xe0,0x01,0x0a]
 ; GFX9: buffer_store_dword [[REG]]
 
 ; FIXME: Shouldn't need right shift and SDWA, also extra copy
@@ -165,11 +165,11 @@ define amdgpu_kernel void @add_inline_imm_0.5_v2f16(ptr addrspace(1) %out, <2 x 
 
 ; GCN-LABEL: {{^}}add_inline_imm_neg_0.5_v2f16:
 ; GFX10: s_load_{{dword|b32}} [[VAL:s[0-9]+]]
-; GFX10: v_pk_add_f16 [[REG:v[0-9]+]], [[VAL]], -0.5 op_sel_hi:[1,0] ; encoding: [0x00,0x40,0x0f,0xcc,0x02,0xe2,0x01,0x0c]
+; GFX10: v_pk_add_f16 [[REG:v[0-9]+]], [[VAL]], -0.5 op_sel_hi:[1,0] ; encoding: [0x00,0x40,0x0f,0xcc,0x02,0xe2,0x01,0x0a]
 ; GFX10: buffer_store_{{dword|b32}} [[REG]]
 
 ; GFX9: s_load_dword [[VAL:s[0-9]+]]
-; GFX9: v_pk_add_f16 [[REG:v[0-9]+]], [[VAL]], -0.5 op_sel_hi:[1,0] ; encoding: [0x00,0x40,0x8f,0xd3,0x06,0xe2,0x01,0x0c]
+; GFX9: v_pk_add_f16 [[REG:v[0-9]+]], [[VAL]], -0.5 op_sel_hi:[1,0] ; encoding: [0x00,0x40,0x8f,0xd3,0x06,0xe2,0x01,0x0a]
 ; GFX9: buffer_store_dword [[REG]]
 
 ; FIXME: Shouldn't need right shift and SDWA, also extra copy
@@ -363,11 +363,11 @@ define amdgpu_kernel void @commute_add_inline_imm_0.5_v2f16(ptr addrspace(1) %ou
 }
 
 ; GCN-LABEL: {{^}}commute_add_literal_v2f16:
-; GFX10: v_pk_add_f16 v0, 0x6400, v0 op_sel_hi:[0,1] ; encoding: [0x00,0x40,0x0f,0xcc,0xff,0x00,0x02,0x14,0x00,0x64,0x00,0x00]
+; GFX10: v_pk_add_f16 v0, 0x6400, v0 op_sel_hi:[0,1] ; encoding: [0x00,0x40,0x0f,0xcc,0xff,0x00,0x02,0x12,0x00,0x64,0x00,0x00]
 
 ; GFX9-DAG: buffer_load_dword [[VAL:v[0-9]+]]
 ; GFX9-DAG: s_movk_i32 [[K:s[0-9]+]], 0x6400 ; encoding
-; GFX9: v_pk_add_f16 [[REG:v[0-9]+]], [[VAL]], [[K]] op_sel_hi:[1,0] ; encoding: [0x00,0x40,0x8f,0xd3,0x00,0x01,0x00,0x0c]
+; GFX9: v_pk_add_f16 [[REG:v[0-9]+]], [[VAL]], [[K]] op_sel_hi:[1,0] ; encoding: [0x00,0x40,0x8f,0xd3,0x00,0x01,0x00,0x0a]
 ; GFX9: buffer_store_dword [[REG]]
 
 ; VI-DAG: buffer_load_dword
