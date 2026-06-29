@@ -281,8 +281,7 @@ SITargetLowering::SITargetLowering(const TargetMachine &TM,
 
   setOperationAction(ISD::SELECT, MVT::i1, Promote);
   setOperationAction(ISD::SELECT, MVT::i64, Custom);
-  setOperationAction(ISD::SELECT, MVT::f64, Promote);
-  AddPromotedToType(ISD::SELECT, MVT::f64, MVT::i64);
+  setOperationAction(ISD::SELECT, MVT::f64, Custom);
 
   setOperationAction(ISD::FSQRT, {MVT::f32, MVT::f64}, Custom);
 
