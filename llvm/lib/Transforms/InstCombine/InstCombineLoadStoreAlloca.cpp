@@ -1103,11 +1103,13 @@ Value *InstCombinerImpl::simplifyNonNullOperand(Value *V, bool UseProvenance,
 ///   --> select Cond, (load TrueC'), (load FalseC')
 /// Only done when both arms fold to a constant, which makes this profitable
 /// regardless of the use count of the select: no new load is created.
-static Instruction *foldLoadOfSelectOfConstPtrs(LoadInst &LI,
+LLVM_ATTRIBUTE_NOINLINE static Instruction *foldLoadOfSelectOfConstPtrs(LoadInst &LI,
                                                 const DataLayout &DL) {
   Value *Op = LI.getOperand(0);
-  // Avoid computing offsets unless the base is a select of constants.
-  Value *Base = getUnderlyingObject(Op);
+  // In canonical IR the pattern is load (select) or load (gep (select)).
+  Value *Base = Op;
+  if (auto *GEP = dyn_cast<GEPOperator>(Base))
+    Base = GEP->getPointerOperand();
   Value *Cond;
   Constant *TrueC, *FalseC;
   if (!match(Base,
@@ -1230,8 +1232,14 @@ Instruction *InstCombinerImpl::visitLoadInst(LoadInst &LI) {
     }
   }
 
-  if (Instruction *Res = foldLoadOfSelectOfConstPtrs(LI, DL))
-    return Res;
+  {
+    Value *P = Op;
+    if (auto *GEP = dyn_cast<GEPOperator>(P))
+      P = GEP->getPointerOperand();
+    if (isa<SelectInst>(P))
+      if (Instruction *Res = foldLoadOfSelectOfConstPtrs(LI, DL))
+        return Res;
+  }
 
   if (!NullPointerIsDefined(LI.getFunction(), LI.getPointerAddressSpace()))
     if (Value *V = simplifyNonNullOperand(Op, /*UseProvenance=*/true))
